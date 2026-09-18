@@ -55,6 +55,7 @@ export async function verifyInPlayground(options: VerifyPlaygroundOptions): Prom
   try {
     // Spawn ephemeral @wp-playground/cli server
     child = spawn('npx', [
+      '-y',
       '@wp-playground/cli',
       'server',
       '--port',

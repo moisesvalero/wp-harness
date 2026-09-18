@@ -100,6 +100,7 @@ export async function checkPhpSyntax(targetPath: string): Promise<CheckPhpSyntax
       } else {
         // Run via WP Playground CLI WebAssembly PHP
         const result = await execFileAsync('npx', [
+          '-y',
           '@wp-playground/cli',
           'php',
           '--mount',

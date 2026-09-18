@@ -34,5 +34,8 @@ jobs:
       - name: Build monorepo packages
         run: pnpm run build
 
+      - name: Pre-cache WP Playground CLI
+        run: npx -y @wp-playground/cli --version
+
       - name: Run Autonomous WordPress Verification Pipeline (test:wp)
         run: pnpm test:wp
