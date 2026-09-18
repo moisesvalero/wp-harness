@@ -131,7 +131,11 @@ async function runAutonomousWordPressTest(): Promise<void> {
   console.log('='.repeat(80));
 }
 
-runAutonomousWordPressTest().catch((error) => {
-  console.error('\n❌ FATAL TEST FAILURE:', error);
-  process.exit(1);
-});
+runAutonomousWordPressTest()
+  .then(() => {
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error('\n❌ FATAL TEST FAILURE:', error);
+    process.exit(1);
+  });

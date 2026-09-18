@@ -128,7 +128,7 @@ export async function verifyInPlayground(options) {
         // Terminate server cleanly
         if (child && child.pid && child.exitCode === null) {
             try {
-                child.kill('SIGTERM');
+                child.kill('SIGKILL');
             }
             catch {
                 // Ignore kill errors

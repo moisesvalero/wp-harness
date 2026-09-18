@@ -161,7 +161,7 @@ export async function verifyInPlayground(options: VerifyPlaygroundOptions): Prom
     // Terminate server cleanly
     if (child && child.pid && child.exitCode === null) {
       try {
-        child.kill('SIGTERM')
+        child.kill('SIGKILL')
       } catch {
         // Ignore kill errors
       }
