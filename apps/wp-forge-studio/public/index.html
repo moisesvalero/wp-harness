@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WP Forge Studio — Asistente de Desarrollo WordPress</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d2327'/><text x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='bold' text-anchor='middle' fill='%232271b1'>W</text><circle cx='25' cy='8' r='3' fill='%23e0a824'/></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --wp-dark: #1d2327;
+      --wp-darker: #101517;
+      --wp-blue: #2271b1;
+      --wp-blue-hover: #135e96;
+      --wp-blue-light: #72aee6;
+      --wp-gold: #e0a824;
+      --wp-gray-bg: #f0f0f1;
+      --wp-card-bg: #ffffff;
+      --wp-border: #dcdcde;
+      --wp-border-dark: #3c434a;
+      --wp-text: #2c3338;
+      --wp-text-muted: #646970;
+      --wp-green: #00a32a;
+      --wp-red: #d63638;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--wp-gray-bg);
+      color: var(--wp-text);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: 280px;
+      background-color: var(--wp-dark);
+      color: #f0f0f1;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-right: 1px solid var(--wp-border-dark);
+    }
+    .sidebar-header {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .logo-badge {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .logo-badge svg { width: 24px; height: 24px; fill: white; }
+    .logo-badge .hammer-dot {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 10px;
+      height: 10px;
+      background: var(--wp-gold);
+      border-radius: 50%;
+      border: 2px solid var(--wp-dark);
+    }
+    .brand-title {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #fff;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--wp-blue-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #8c8f94;
+      padding: 0 8px;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+    .theme-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .theme-item {
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 13px;
+      color: #c3c4c7;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .theme-item:hover, .theme-item.active {
+      background: rgba(34, 113, 177, 0.2);
+      border-color: var(--wp-blue);
+      color: #fff;
+    }
+    .theme-item svg { width: 16px; height: 16px; fill: currentColor; }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--wp-darker);
+    }
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #a7aaad;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--wp-green);
+      box-shadow: 0 0 8px var(--wp-green);
+    }
+    .status-dot.offline { background: var(--wp-red); box-shadow: 0 0 8px var(--wp-red); }
+
+    /* --- MAIN AREA --- */
+    .main-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* TOP BAR */
+    .topbar {
+      height: 60px;
+      background: #fff;
+      border-bottom: 1px solid var(--wp-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .model-selector-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f6f7f7;
+      border: 1px solid var(--wp-border);
+      border-radius: 6px;
+      padding: 4px 10px;
+    }
+    .model-selector-wrap label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--wp-text-muted);
+    }
+    .model-select {
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--wp-text);
+      outline: none;
+      cursor: pointer;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--wp-blue);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--wp-blue-hover);
+    }
+    .btn-secondary {
+      background: #fff;
+      border-color: var(--wp-border);
+      color: var(--wp-text);
+    }
+    .btn-secondary:hover {
+      background: #f6f7f7;
+      border-color: #8c8f94;
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #e0a824 0%, #c48e15 100%);
+      color: #101517;
+      font-weight: 700;
+    }
+    .btn-gold:hover {
+      filter: brightness(1.08);
+    }
+
+    /* CHAT AREA */
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .chat-inner {
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* WELCOME SCREEN */
+    .welcome-card {
+      background: #fff;
+      border: 1px solid var(--wp-border);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      margin-top: 20px;
+    }
+    .welcome-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .welcome-icon {
+      width: 48px;
+      height: 48px;
+      background: #2271b1;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 24px;
+    }
+    .welcome-card h1 {
+      font-size: 22px;
+      color: var(--wp-dark);
+      font-weight: 700;
+    }
+    .welcome-card p {
+      color: var(--wp-text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .prompt-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .prompt-chip {
+      background: #f6f7f7;
+      border: 1px solid var(--wp-border);
+      border-radius: 8px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .prompt-chip:hover {
+      border-color: var(--wp-blue);
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(34, 113, 177, 0.08);
+      transform: translateY(-1px);
+    }
+    .prompt-chip-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--wp-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .prompt-chip-desc {
+      font-size: 12px;
+      color: var(--wp-text-muted);
+      line-height: 1.4;
+    }
+
+    /* MESSAGES */
+    .msg-row {
+      display: flex;
+      gap: 14px;
+      animation: fadeIn 0.2s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .msg-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .msg-avatar.user {
+      background: #e2e4e7;
+      color: #3c434a;
+    }
+    .msg-avatar.agent {
+      background: linear-gradient(135deg, #1d2327 0%, #2271b1 100%);
+      color: #fff;
+    }
+    .msg-body {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--wp-border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--wp-text);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .msg-body.user-msg {
+      background: #f6f7f7;
+    }
+    .msg-body h2, .msg-body h3 {
+      color: var(--wp-dark);
+      margin: 12px 0 6px 0;
+      font-size: 16px;
+    }
+    .msg-body p { margin-bottom: 10px; }
+    .msg-body p:last-child { margin-bottom: 0; }
+    .msg-body pre {
+      background: #1d2327;
+      color: #f0f0f1;
+      padding: 12px 14px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      margin: 10px 0;
+    }
+    .msg-body code {
+      background: #f0f0f1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: #b32d2e;
+    }
+    .msg-body pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* TOOL CALL CARDS */
+    .tool-card {
+      background: #f6f7f7;
+      border-left: 4px solid var(--wp-blue);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .tool-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      color: var(--wp-dark);
+    }
+    .tool-tag {
+      font-size: 11px;
+      background: rgba(34,113,177,0.12);
+      color: var(--wp-blue);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tool-success {
+      border-left-color: var(--wp-green);
+    }
+    .tool-success .tool-tag {
+      background: rgba(0,163,42,0.12);
+      color: var(--wp-green);
+    }
+
+    /* CHAT INPUT */
+    .input-bar {
+      background: #fff;
+      border-top: 1px solid var(--wp-border);
+      padding: 16px 24px;
+    }
+    .input-box-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #8c8f94;
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: border-color 0.15s;
+    }
+    .input-box-wrap:focus-within {
+      border-color: var(--wp-blue);
+      box-shadow: 0 0 0 1px var(--wp-blue);
+    }
+    .chat-textarea {
+      width: 100%;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 48px;
+      max-height: 160px;
+    }
+    .input-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #f0f0f1;
+      padding-top: 6px;
+    }
+    .input-hint {
+      font-size: 11.5px;
+      color: #8c8f94;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      backdrop-filter: blur(3px);
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: #fff;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 18px 24px;
+      background: var(--wp-dark);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h3 { font-size: 16px; font-weight: 700; }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: #a7aaad;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--wp-dark);
+    }
+    .form-group input {
+      padding: 10px 12px;
+      border: 1px solid var(--wp-border);
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: var(--wp-blue);
+    }
+    .form-group small {
+      font-size: 11.5px;
+      color: var(--wp-text-muted);
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      background: #f6f7f7;
+      border-top: 1px solid var(--wp-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-7.07 17.07l4.47-12.28a1.2 1.2 0 0 1 1.2-.82h.4a1.2 1.2 0 0 1 1.2.82l2.3 6.3 1.8-4.9a1.2 1.2 0 0 1 1.2-.82h.3a1.2 1.2 0 0 1 1.2.82l4.47 12.28A10 10 0 0 0 12 2zm0 18a8 8 0 0 1-5.65-2.35l3.2-8.8 2.45 6.7a1.2 1.2 0 0 0 1.2.8h.4a1.2 1.2 0 0 0 1.2-.8l1.45-3.95 3.2 8.8A8 8 0 0 1 12 20z"/></svg>
+        <div class="hammer-dot"></div>
+      </div>
+      <div>
+        <div class="brand-title">WP Forge</div>
+        <div class="brand-sub">WordPress Studio</div>
+      </div>
+    </div>
+
+    <div class="sidebar-content">
+      <div>
+        <div class="section-label">Temas Generados</div>
+        <div class="theme-list" id="themeList">
+          <div class="theme-item active">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4zM2 4v16h20V4zm4 4h4v4H6zm0 6h4v2H6zm6-6h6v2h-6zm0 4h6v4h-6z"/></svg>
+            <span id="activeThemeLabel">workspace/</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Acciones Rápidas</div>
+        <div class="theme-list">
+          <div class="theme-item" onclick="openPlayground()">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <span>Probar en Sandbox</span>
+          </div>
+          <a class="theme-item" href="/api/download-zip" download style="text-decoration:none;">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            <span>Descargar site.zip</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="status-indicator">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Conectando...</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAP -->
+  <div class="main-wrap">
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="model-selector-wrap">
+          <label for="modelSelect">Modelo:</label>
+          <select class="model-select" id="modelSelect">
+            <option value="openai/gpt-4o-mini">GPT-4o Mini (Recomendado)</option>
+            <option value="anthropic/claude-3.7-sonnet">Claude 3.7 Sonnet</option>
+            <option value="google/gemini-2.5-flash">Gemini 2.5 Flash</option>
+            <option value="deepseek/deepseek-chat">DeepSeek V3</option>
+            <option value="openai/gpt-4o">GPT-4o</option>
+            <option value="meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button class="btn btn-secondary" onclick="openSettings()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Ajustes API
+        </button>
+        <button class="btn btn-primary" onclick="openPlayground()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Probar en Playground
+        </button>
+        <a class="btn btn-gold" href="/api/download-zip" download>
+          📦 Descargar ZIP
+        </a>
+      </div>
+    </header>
+
+    <!-- CHAT CONTAINER -->
+    <main class="chat-container" id="chatContainer">
+      <div class="chat-inner" id="chatInner">
+        <!-- WELCOME CARD -->
+        <div class="welcome-card" id="welcomeCard">
+          <div class="welcome-header">
+            <div class="welcome-icon">🔨</div>
+            <div>
+              <h1>Bienvenido a WP Forge Studio</h1>
+              <p>Tu asistente autónomo de desarrollo para WordPress con arquitectura FSE y sandbox WebAssembly.</p>
+            </div>
+          </div>
+
+          <div class="prompt-grid">
+            <div class="prompt-chip" onclick="usePrompt('Crea un tema FSE completo para un Restaurante Italiano llamado Bella Italia, con colores negro y dorado, sección de carta y reserva de mesas.')">
+              <div class="prompt-chip-title">🍕 Restaurante Italiano</div>
+              <div class="prompt-chip-desc">Tema FSE elegante, carta de menú y formulario de reserva.</div>
+            </div>
+            <div class="prompt-chip" onclick="usePrompt('Crea un tema moderno para una tienda de moda online compatible con WooCommerce, con catálogo y diseño minimalista.')">
+              <div class="prompt-chip-title">🛍️ Tienda Online</div>
+              <div class="prompt-chip-desc">Templates de productos, catálogo y compatibilidad de bloques.</div>
+            </div>
+            <div class="prompt-chip" onclick="usePrompt('Crea un tema de blog editorial y revista digital con tipografía fluida, modo oscuro y grid de noticias.')">
+              <div class="prompt-chip-title">📰 Blog Editorial</div>
+              <div class="prompt-chip-desc">Diseño limpio para noticias con soporte de theme.json v3.</div>
+            </div>
+            <div class="prompt-chip" onclick="usePrompt('Crea una landing page para una consultora tecnológica con servicios, testimonios y contacto.')">
+              <div class="prompt-chip-title">💼 Web Corporativa</div>
+              <div class="prompt-chip-desc">Estructura profesional para empresas y captura de leads.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- INPUT BAR -->
+    <footer class="input-bar">
+      <div class="input-box-wrap">
+        <textarea class="chat-textarea" id="chatInput" placeholder="Describe el sitio o tema WordPress que quieres construir..." rows="1"></textarea>
+        <div class="input-bottom">
+          <span class="input-hint">Shift + Enter para nueva línea | Enter para enviar</span>
+          <button class="btn btn-primary" id="sendBtn" onclick="sendMessage()">
+            Enviar
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Ajustes de API Keys</h3>
+        <button class="modal-close" onclick="closeSettings()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>OpenRouter API Key (Recomendado - Todos los modelos)</label>
+          <input type="password" id="openRouterKeyInput" placeholder="sk-or-v1-..." />
+          <small>Con OpenRouter tienes acceso a GPT-4o, Claude 3.7, Gemini 2.5, DeepSeek y Llama desde una sola clave.</small>
+        </div>
+        <div class="form-group">
+          <label>OpenAI API Key (Directo)</label>
+          <input type="password" id="openAiKeyInput" placeholder="sk-..." />
+        </div>
+        <div class="form-group">
+          <label>Anthropic API Key (Claude Directo)</label>
+          <input type="password" id="anthropicKeyInput" placeholder="sk-ant-..." />
+        </div>
+        <div class="form-group">
+          <label>Google Gemini API Key (Directo)</label>
+          <input type="password" id="geminiKeyInput" placeholder="AIza..." />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeSettings()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveSettings()">Guardar en .env</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const chatContainer = document.getElementById('chatContainer');
+    const chatInner = document.getElementById('chatInner');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const modelSelect = document.getElementById('modelSelect');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const settingsModal = document.getElementById('settingsModal');
+
+    let history = [];
+    let isSending = false;
+
+    // Load initial config
+    async function loadConfig() {
+      try {
+        const res = await fetch('/api/config');
+        const data = await res.json();
+        if (data.hasKeys) {
+          statusDot.className = 'status-dot';
+          statusText.textContent = data.activeProvider + ' Conectado (' + data.activeKeyPreview + ')';
+        } else {
+          statusDot.className = 'status-dot offline';
+          statusText.textContent = 'Sin API Key';
+        }
+
+        if (data.rawKeys) {
+          document.getElementById('openRouterKeyInput').value = data.rawKeys.openRouter || '';
+          document.getElementById('openAiKeyInput').value = data.rawKeys.openAi || '';
+          document.getElementById('anthropicKeyInput').value = data.rawKeys.anthropic || '';
+          document.getElementById('geminiKeyInput').value = data.rawKeys.gemini || '';
+        }
+
+        if (data.existingThemes && data.existingThemes.length > 0) {
+          document.getElementById('activeThemeLabel').textContent = 'workspace/' + data.existingThemes[0];
+        }
+      } catch (err) {
+        statusDot.className = 'status-dot offline';
+        statusText.textContent = 'Error conectando con servidor';
+      }
+    }
+
+    loadConfig();
+
+    // Auto-expand textarea
+    chatInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 160) + 'px';
+    });
+
+    chatInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    function usePrompt(text) {
+      chatInput.value = text;
+      sendMessage();
+    }
+
+    async function sendMessage() {
+      const text = chatInput.value.trim();
+      if (!text || isSending) return;
+
+      const welcome = document.getElementById('welcomeCard');
+      if (welcome) welcome.style.display = 'none';
+
+      // Append User message
+      appendMessage('user', text);
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+      isSending = true;
+      sendBtn.disabled = true;
+
+      // Append placeholder Agent message
+      const agentMsgRow = appendMessage('agent', 'Iniciando generación...');
+      const bodyEl = agentMsgRow.querySelector('.msg-body');
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            model: modelSelect.value,
+            history: history
+          })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          bodyEl.innerHTML = '<span style="color:var(--wp-red);">❌ Error: ' + (errData.error || response.statusText) + '</span>';
+          isSending = false;
+          sendBtn.disabled = false;
+          return;
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let fullText = '';
+        let toolCards = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop(); // keep last incomplete line
+
+          let eventType = null;
+          for (const line of lines) {
+            if (line.startsWith('event: ')) {
+              eventType = line.replace('event: ', '').trim();
+            } else if (line.startsWith('data: ') && eventType) {
+              const dataStr = line.replace('data: ', '').trim();
+              let data = {};
+              try { data = JSON.parse(dataStr); } catch {}
+
+              if (eventType === 'status') {
+                bodyEl.innerHTML = toolCards + '<p><em>⏳ ' + data.message + '</em></p>';
+              } else if (eventType === 'tool_call') {
+                toolCards += '<div class="tool-card"><div class="tool-header"><span>⚙️ Ejecutando herramienta</span><span class="tool-tag">' + data.name + '</span></div></div>';
+                bodyEl.innerHTML = toolCards;
+              } else if (eventType === 'tool_finish') {
+                toolCards += '<div class="tool-card tool-success"><div class="tool-header"><span>✓ ' + data.name + ' completado</span><span class="tool-tag">OK</span></div></div>';
+                bodyEl.innerHTML = toolCards;
+              } else if (eventType === 'text') {
+                fullText += data.content;
+                bodyEl.innerHTML = toolCards + formatMarkdown(fullText);
+              } else if (eventType === 'error') {
+                bodyEl.innerHTML = toolCards + '<p style="color:var(--wp-red);">❌ ' + data.message + '</p>';
+              }
+              chatContainer.scrollTop = chatContainer.scrollHeight;
+              eventType = null;
+            }
+          }
+        }
+
+        history.push({ role: 'user', content: text });
+        history.push({ role: 'assistant', content: fullText });
+      } catch (err) {
+        bodyEl.innerHTML = '<span style="color:var(--wp-red);">❌ Error de red: ' + err.message + '</span>';
+      } finally {
+        isSending = false;
+        sendBtn.disabled = false;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        loadConfig(); // Refresh existing themes
+      }
+    }
+
+    function appendMessage(role, text) {
+      const row = document.createElement('div');
+      row.className = 'msg-row';
+      const avatar = document.createElement('div');
+      avatar.className = 'msg-avatar ' + role;
+      avatar.textContent = role === 'user' ? 'TÚ' : 'WP';
+
+      const body = document.createElement('div');
+      body.className = 'msg-body ' + (role === 'user' ? 'user-msg' : '');
+      body.innerHTML = formatMarkdown(text);
+
+      row.appendChild(avatar);
+      row.appendChild(body);
+      chatInner.appendChild(row);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      return row;
+    }
+
+    function formatMarkdown(src) {
+      if (!src) return '';
+      let html = src
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      // Code blocks
+      html = html.replace(/```([a-z]*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+      // Inline code
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // Headers
+      html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+      html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+      // Bold
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      // Paragraphs
+      html = html.split('\n\n').map(p => '<p>' + p.replace(/\n/g, '<br>') + '</p>').join('');
+      return html;
+    }
+
+    async function openPlayground() {
+      const btn = event?.target;
+      if (btn) btn.textContent = '⏳ Arrancando Playground...';
+      try {
+        const res = await fetch('/api/playground/launch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        const data = await res.json();
+        if (data.success && data.url) {
+          window.open(data.url, '_blank');
+        } else {
+          alert('Error al arrancar Playground: ' + (data.error || 'Desconocido'));
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Probar en Playground';
+      }
+    }
+
+    function openSettings() {
+      settingsModal.classList.add('active');
+    }
+
+    function closeSettings() {
+      settingsModal.classList.remove('active');
+    }
+
+    async function saveSettings() {
+      const openRouterKey = document.getElementById('openRouterKeyInput').value.trim();
+      const openAiKey = document.getElementById('openAiKeyInput').value.trim();
+      const anthropicKey = document.getElementById('anthropicKeyInput').value.trim();
+      const geminiKey = document.getElementById('geminiKeyInput').value.trim();
+
+      try {
+        const res = await fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ openRouterKey, openAiKey, anthropicKey, geminiKey })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ Claves guardadas en .env');
+          closeSettings();
+          loadConfig();
+        } else {
+          alert('Error guardando: ' + data.error);
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
