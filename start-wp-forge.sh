@@ -1,26 +1,28 @@
 #!/bin/bash
 # ============================================================
-# WP Forge — Script de arranque
-# Abre la interfaz de chat WordPress Studio en el navegador.
+# DeepSeek Harness (Antigravity 2.0) — WordPress Edition (WP Forge)
 # ============================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# Cargar variables de entorno si existe .env
+# Sincronizar .env a ~/.dsh/.env para que el arnés nativo de DeepSeek lo cargue
 if [ -f "$SCRIPT_DIR/.env" ]; then
+  mkdir -p "$HOME/.dsh"
+  cp "$SCRIPT_DIR/.env" "$HOME/.dsh/.env"
   set -a
   source "$SCRIPT_DIR/.env"
   set +a
 fi
 
-echo "🔨 Iniciando WP Forge Studio..."
-echo "📍 Puerto: 3888"
-echo "🤖 Modelo: ${OPENROUTER_API_KEY:+OpenRouter}${OPENAI_API_KEY:+OpenAI}${ANTHROPIC_API_KEY:+Anthropic}${GOOGLE_API_KEY:+Gemini}${DEEPSEEK_API_KEY:+DeepSeek}"
+echo "============================================================="
+echo "🚀 DEEPSEEK HARNESS (ANTIGRAVITY 2.0) — WORDPRESS AGENT WORKBENCH"
+echo "============================================================="
+echo "📍 Modelo activo: OpenRouter (GPT-4o Mini / Claude 3.7 / Gemini / DeepSeek)"
+echo "📍 Agente activo: WP Forge (Full Site Editing, theme.json v3, Security)"
+echo "📍 Workspace: $SCRIPT_DIR/workspace"
+echo "============================================================="
 echo ""
 
-# Abrir el navegador tras 1.5s
-(sleep 1.5 && open "http://127.0.0.1:3888") &
-
-# Arrancar el servidor de WP Forge Studio
-node "$SCRIPT_DIR/apps/wp-forge-studio/server.js"
+# Arrancar DeepSeek Harness Web UI nativa
+exec node "$SCRIPT_DIR/apps/cli/lib/bin.js" web
