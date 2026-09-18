@@ -1,308 +1,259 @@
-# WP-Harness 🚀
+# 🔨 WP Forge
 
-**Autonomous WordPress FSE Block Theme & Site Generation Engine**
-*Built on DeepSeek Harness (`dsh`), Cordis Microkernel, Universal Multi-Model Routing, and Ephemeral WebAssembly Sandboxing.*
+> **Chat with an AI agent and build WordPress sites — no code required.**
+> An open-source conversational WordPress development environment built on [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness).
 
 ---
 
-[English](README.md) | [🇪🇸 Español](README.es.md) | [中文](README.zh.md)
+[🇬🇧 English](README.md) | [🇪🇸 Español](README.es.md)
 
 ---
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.19.0%20%7C%7C%20%3E%3D20.19.0-brightgreen.svg)](https://nodejs.org/)
-[![Package Manager](https://img.shields.io/badge/pnpm-10%2B-orange.svg)](https://pnpm.io/)
-[![WordPress Version](https://img.shields.io/badge/WordPress-6.5%20%7C%206.7%20FSE-21759B.svg)](https://wordpress.org/)
-[![Sandbox: WebAssembly](https://img.shields.io/badge/Sandbox-WP%20Playground%20WASM-purple.svg)](https://wordpress.github.io/wordpress-playground/)
-[![Architecture](https://img.shields.io/badge/Architecture-Cordis%20Everything--is--a--Plugin-informational.svg)](https://github.com/cordiverse/cordis)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-10%2B-orange.svg)](https://pnpm.io/)
+[![WordPress](https://img.shields.io/badge/WordPress-6.5%2B%20FSE-21759B.svg)](https://wordpress.org/)
+[![WP Playground](https://img.shields.io/badge/Sandbox-WP%20Playground%20WASM-blue.svg)](https://wordpress.github.io/wordpress-playground/)
 
 ---
 
-## 📖 Table of Contents
+## What is WP Forge?
 
-- [Overview](#-overview)
-- [Key Features](#-key-features)
-- [System Architecture](#-system-architecture)
-- [Prerequisites & Quick Start](#-prerequisites--quick-start)
-- [Universal Multi-Model Configuration](#-universal-multi-model-configuration)
-- [WordPress MCP Server Tooling](#-wordpress-mcp-server-tooling)
-- [Agent Skills & Coding Standards](#-agent-skills--coding-standards)
-- [Autonomous Verification Pipeline](#-autonomous-verification-pipeline)
-- [CLI & Web UI Usage](#-cli--web-ui-usage)
-- [Repository Structure](#-repository-structure)
-- [Security & Quality Assurance](#-security--quality-assurance)
-- [Attribution & License](#-attribution--license)
+WP Forge is a **chat-based WordPress development agent** you run locally. Open it, describe what you want in plain language, and the agent builds it — themes, plugins, content — while verifying everything actually works in a live WordPress environment.
 
----
+Think of it as having a senior WordPress developer available 24/7 through a chat interface, powered by the AI model of your choice.
 
-## 🌟 Overview
+```
+You:    "Create a modern website for my Italian restaurant with a dark gold
+         theme, a menu section, and a reservation form"
 
-**WP-Harness** is an enterprise-grade autonomous agent harness specifically engineered to design, build, audit, and package modern **WordPress Full Site Editing (FSE) Block Themes** and full website architectures from a single prompt.
-
-Originating from [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`dsh`) and powered by the [Cordis](https://github.com/cordiverse/cordis) microkernel, WP-Harness elevates agentic WordPress development by solving key real-world challenges:
-
-1. **Zero Host PHP/MySQL Requirements**: Leverages `@wp-playground/cli` to boot an ephemeral, isolated WordPress instance directly inside WebAssembly (WASM) for syntax linting, health checking, and visual testing.
-2. **Universal Multi-Model Gateway**: Seamlessly routes tasks between **DeepSeek** (`deepseek-chat`, `deepseek-reasoner`), **OpenRouter**, **Anthropic** (Claude 3.7 Sonnet / 3.5 Sonnet), **OpenAI** (GPT-4o, o3-mini), and local self-hosted **Ollama** instances with automated Cordis configuration patching.
-3. **Dedicated WordPress Model Context Protocol (MCP)**: Native tools for block scaffolding, automated theme validation, headless playground testing, and production zip artifact bundling.
-4. **Strict Architectural Skills**: Pre-configured agent personas enforcing WordPress standards: `theme.json` v3 schema compliance, HTML block patterns, block markup without deprecations, semantic accessibility (WCAG 2.1 AA), and robust security escaping.
-
----
-
-## ✨ Key Features
-
-- **Single-Prompt Autonomous Generation**: Create fully realized, production-ready block themes complete with `templates/`, `parts/`, `patterns/`, `theme.json`, and `functions.php`.
-- **Ephemeral WebAssembly Verification Sandbox**: Every generated theme is automatically booted in `@wp-playground/cli` (WordPress 6.7 on PHP 8.3 via WASM). Validates HTTP 200 OK responses, rendering integrity, and zero fatal PHP errors before delivery.
-- **Universal Multi-Model Router**: Built-in routing package (`@wp-harness/universal-model-router`) allowing instant fallback, dynamic Cordis YAML profile patching, and environment-variable-driven key management.
-- **WordPress MCP Server**: Exposes standard Model Context Protocol endpoints (`wp_scaffold_theme`, `check_php_syntax`, `verify_in_playground`, `finish_task`) designed for autonomous agents.
-- **Enterprise Block Theme Standards**: Strict validation for `theme.json` (version 3), Gutenberg block markup (`<!-- wp:... -->`), custom block patterns, translations ready (`esc_html__`, `esc_attr__`), and asset registration.
-- **Dual User Interface**: Run headlessly in CI/CD terminal loops or interactively via the built-in Cordis Web Dashboard (`dsh web`).
-
----
-
-## 🏗 System Architecture
-
-```mermaid
-flowchart TD
-    UserPrompt["👤 User Natural Language Prompt"] --> HarnessCLI["⚡ WP-Harness CLI / Web UI (apps/cli)"]
-
-    subgraph CoreEngine["DeepSeek Harness + Cordis Microkernel"]
-        HarnessCLI --> AgentRuntime["Autonomous Agent Runtime (packages/core)"]
-        AgentRuntime --> SkillsEngine["Skills & Rules Engine (.agents/skills)"]
-        AgentRuntime --> ModelRouter["Universal Model Router (packages/universal-model-router)"]
-    end
-
-    subgraph LLMProviders["Universal Multi-Model Layer"]
-        ModelRouter --> DeepSeek["DeepSeek (V3 / R1)"]
-        ModelRouter --> OpenRouter["OpenRouter Gateway"]
-        ModelRouter --> Anthropic["Anthropic (Claude 3.7/3.5)"]
-        ModelRouter --> OpenAI["OpenAI (GPT-4o / o3-mini)"]
-        ModelRouter --> Ollama["Ollama Local LLMs"]
-    end
-
-    subgraph MCP["WordPress MCP Server (packages/wp-mcp-server)"]
-        AgentRuntime --> ToolScaffold["wp_scaffold_theme"]
-        AgentRuntime --> ToolLint["check_php_syntax (PHP WASM)"]
-        AgentRuntime --> ToolPlayground["verify_in_playground"]
-        AgentRuntime --> ToolFinish["finish_task (Zip Packaging)"]
-    end
-
-    subgraph EphemeralSandbox["Ephemeral Verification Sandbox (@wp-playground/cli)"]
-        ToolPlayground --> WasmWP["WordPress 6.7 + PHP 8.3 in WebAssembly"]
-        WasmWP --> HealthCheck["HTTP 200 Assertion & Fatal Error Audit"]
-    end
-
-    ToolFinish --> DistArtifact["📦 Production Ready site.zip (dist/site.zip)"]
+Agent:  "Building the theme now..."
+        ✓ FSE Block Theme scaffolded (theme.json v3, Gutenberg templates)
+        ✓ PHP syntax: 0 errors
+        ✓ WordPress Playground: HTTP 200 OK, theme active, 0 fatal errors
+        ✓ Packaged → dist/site.zip (ready to install on your WordPress)
 ```
 
 ---
 
-## 🚀 Prerequisites & Quick Start
+## Features
 
-### System Requirements
-
-- **Operating System**: macOS (Apple Silicon / Intel), Linux (x86_64 / arm64), or Windows (PowerShell 7)
-- **Node.js**: `^22.19.0` or `>=20.19.0`
-- **pnpm**: `>=10.0.0`
-- **Host PHP**: **Not required!** (WebAssembly provides the isolated PHP 8.3 execution runtime).
-
-### Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/moisesvalero/wp-harness.git
-   cd wp-harness
-   ```
-
-2. **Install all monorepo dependencies**:
-   ```bash
-   pnpm install
-   ```
-
-3. **Build native packages and client artifacts**:
-   ```bash
-   pnpm run build
-   ```
-
-4. **Verify the installation via autonomous self-test**:
-   ```bash
-   pnpm test:wp
-   ```
-   *This command runs the autonomous benchmark pipeline: scaffolds an Italian Restaurant FSE block theme, checks PHP syntax via WebAssembly, boots WordPress Playground, asserts HTTP 200 with zero fatal errors, and packages `dist/site.zip`.*
+- **Conversational interface** — same chat UI as Claude Desktop, Cursor, or Antigravity
+- **WordPress-specialized agent** — knows FSE, Gutenberg, Coding Standards, security
+- **Works without an installed WordPress** — uses WP Playground (WebAssembly) as sandbox
+- **Connects to your live WordPress** — manage posts, pages, themes, plugins via REST API
+- **Any LLM model** — OpenAI, Anthropic, Gemini, Groq, DeepSeek, Ollama, and more
+- **Verified output** — never marks a task done without running it in WordPress first
 
 ---
 
-## 🔑 Universal Multi-Model Configuration
+## Quick Start
 
-WP-Harness includes a dynamic, zero-lockin multi-provider routing layer located in `packages/universal-model-router`. It auto-detects ambient API keys and routes agent generation tasks to the best-suited foundation model.
+### Prerequisites
 
-### 1. Configure Environment Variables
+- Node.js 22+ and pnpm 10+
+- An API key for at least one LLM provider (OpenAI, Anthropic, Gemini, etc.)
 
-Copy `.env.example` to `.env` in the root directory:
+### 1. Clone
 
 ```bash
-cp .env.example .env
+git clone https://github.com/moisesvalero/wp-harness.git
+cd wp-harness
+pnpm install
+pnpm run build
 ```
 
-Populate the key for your preferred provider (or configure multiple for automatic fallback).
-
-### 2. Comprehensive 15-Provider Capabilities Matrix
-
-| Provider | Recommended Coding Model | Reasoning / Planning Model | Environment Variable | Protocol & Context | Key Strength |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Google Gemini** | `gemini-2.5-pro` | `gemini-2.5-pro` | `GEMINI_API_KEY` | OpenAI Comp. (1M+) | Ultra-long 1M+ context window & multimodal reasoning |
-| **Mistral / Codestral** | `codestral-latest` | `mistral-large-latest` | `MISTRAL_API_KEY` | OpenAI Comp. (256k) | Specialized code generation, FSE block patterns & multilingual |
-| **Cohere Command** | `command-r-plus-08-2024` | `command-r-plus` | `COHERE_API_KEY` | OpenAI Comp. (128k) | Command R+ enterprise agent planning and structured tool use |
-| **Groq LPU** | `llama-3.3-70b-versatile` | `deepseek-r1-distill-llama-70b` | `GROQ_API_KEY` | OpenAI Comp. (128k) | Ultra-fast LPU inference delivering near-instant multi-turn loops |
-| **Anthropic Claude** | `claude-3-7-sonnet-20250219` | `claude-3-7-sonnet` (thinking) | `ANTHROPIC_API_KEY` | Anthropic Msg. (200k) | Hybrid thinking, architectural refactors & benchmark coding leader |
-| **OpenAI** | `gpt-4o` | `o3-mini` / `o1` | `OPENAI_API_KEY` | OpenAI Comp. (128k) | Flagship reasoning and deterministic JSON structured outputs |
-| **OpenRouter** | `deepseek/deepseek-r1` | `anthropic/claude-3.7-sonnet` | `OPENROUTER_API_KEY` | OpenAI Comp. (Dynamic) | Aggregator gateway across 200+ models with dynamic failover |
-| **Together AI** | `deepseek-ai/DeepSeek-V3` | `deepseek-ai/DeepSeek-R1` | `TOGETHER_API_KEY` | OpenAI Comp. (128k) | High-speed serverless cloud inference for open-weight models |
-| **xAI Grok** | `grok-2-1212` | `grok-2-vision-1212` | `XAI_API_KEY` | OpenAI Comp. (128k) | Frontier Grok reasoning, vision, and real-time intelligence |
-| **Cerebras** | `llama-3.3-70b` | `llama-3.3-70b` | `CEREBRAS_API_KEY` | OpenAI Comp. (128k) | Wafer-Scale cluster with world-record generation throughput |
-| **Fireworks AI** | `accounts/fireworks/models/deepseek-v3` | `accounts/fireworks/models/deepseek-r1` | `FIREWORKS_API_KEY` | OpenAI Comp. (128k) | Enterprise serverless hosting for DeepSeek and Qwen 2.5 Coder |
-| **Perplexity** | `sonar-pro` | `sonar-reasoning-pro` | `PERPLEXITY_API_KEY` | OpenAI Comp. (128k) | Live web-grounded Sonar models for real-time WP core research |
-| **DeepInfra** | `deepseek-ai/DeepSeek-V3` | `deepseek-ai/DeepSeek-R1` | `DEEPINFRA_API_KEY` | OpenAI Comp. (128k) | Cost-effective GPU cloud inference for open-source LLMs |
-| **Local Ollama** | `qwen2.5-coder:32b` | `deepseek-r1:32b` | `OLLAMA_BASE_URL` | OpenAI Comp. (32k) | 100% offline, privacy-first local models (zero cloud API cost) |
-| **DeepSeek Official** | `deepseek-chat` (V3) | `deepseek-reasoner` (R1) | `DEEPSEEK_API_KEY` | Native SSE / OpenAI (64k) | Official direct provider with native high-performance SSE stream |
-
-### 3. CLI Inspection & Dynamic Cordis Profile Patching
-
-Inspect registered providers or check which environment keys are configured:
+### 2. Configure your API key
 
 ```bash
-# List all 15 supported providers and default models
-node packages/universal-model-router/dist/cli.js --list
+cp .env.wp-forge .env
+```
 
-# Audit which provider API keys are active in your current shell
-node packages/universal-model-router/dist/cli.js --status
+Open `.env` and uncomment the line for your model provider:
 
-# Generate dynamic Cordis YAML profile patch
-node packages/universal-model-router/dist/cli.js --patch
+```bash
+# Pick ONE (or more):
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GOOGLE_API_KEY=AIza...
+DEEPSEEK_API_KEY=sk-...
+GROQ_API_KEY=gsk_...
+OPENROUTER_API_KEY=sk-or-...
+# MISTRAL_API_KEY=...
+# OLLAMA_BASE_URL=http://localhost:11434   ← for local models, no key needed
+```
+
+### 3. Launch
+
+```bash
+./start-wp-forge.sh
+```
+
+Your browser opens automatically. Select the **WP Forge** agent preset and start chatting.
+
+---
+
+## What you can build
+
+| Ask the agent... | What happens |
+|---|---|
+| *"Create a blog theme with a minimal design"* | Generates FSE theme → verifies in WP Playground → delivers `site.zip` |
+| *"Build a restaurant site with reservations"* | Scaffolds theme + reservation form + custom post types |
+| *"Create a WooCommerce-ready theme"* | Generates theme with shop templates and product blocks |
+| *"Publish a new post on my WordPress"* | Connects to your WP via REST API and creates the post |
+| *"List all my installed plugins"* | Queries your WordPress and shows plugin list |
+| *"Fix the PHP error in functions.php"* | Reads the file, fixes it, verifies syntax, done |
+
+---
+
+## Connecting to your live WordPress (optional)
+
+To let the agent manage your actual WordPress site, add these to your `.env`:
+
+```bash
+WORDPRESS_SITE_URL=https://your-site.com
+WORDPRESS_USERNAME=admin
+WORDPRESS_APP_PASSWORD=xxxx xxxx xxxx xxxx xxxx xxxx
+```
+
+> **How to get Application Password:** WordPress Admin → Users → Your Profile → Application Passwords → Add New
+
+Once configured, the agent has access to 50+ WordPress management tools (posts, pages, media, themes, plugins, menus, users, settings, and more) via the [mcp-wordpress](https://github.com/docdyhr/mcp-wordpress) server.
+
+---
+
+## Supported LLM Providers
+
+| Provider | Models | Key |
+|---|---|---|
+| **OpenAI** | GPT-4o, o3-mini | `OPENAI_API_KEY` |
+| **Anthropic** | Claude 3.7 Sonnet, Claude 3.5 Haiku | `ANTHROPIC_API_KEY` |
+| **Google** | Gemini 2.5 Pro, Gemini 2.5 Flash | `GOOGLE_API_KEY` |
+| **DeepSeek** | DeepSeek Chat (V3), DeepSeek Reasoner (R1) | `DEEPSEEK_API_KEY` |
+| **Groq** | Llama 3.3 70B, Mixtral 8x7B | `GROQ_API_KEY` |
+| **Mistral** | Mistral Large, Codestral | `MISTRAL_API_KEY` |
+| **Cohere** | Command R+ | `COHERE_API_KEY` |
+| **xAI** | Grok-3 | `XAI_API_KEY` |
+| **OpenRouter** | Any model via unified API | `OPENROUTER_API_KEY` |
+| **Together AI** | Llama, Qwen, DeepSeek | `TOGETHER_API_KEY` |
+| **Fireworks AI** | DeepSeek V3, Qwen 2.5 Coder | `FIREWORKS_API_KEY` |
+| **Perplexity** | Sonar Pro | `PERPLEXITY_API_KEY` |
+| **Cerebras** | Llama 3.1 70B (ultra-fast) | `CEREBRAS_API_KEY` |
+| **DeepInfra** | DeepSeek V3, R1 | `DEEPINFRA_API_KEY` |
+| **Ollama** | Any local model | `OLLAMA_BASE_URL` |
+
+Switch between providers at any time from the UI — no restart needed.
+
+---
+
+## How it works
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   WP Forge (UI)                     │
+│         Chat interface — runs in your browser       │
+└───────────────────┬─────────────────────────────────┘
+                    │ natural language
+┌───────────────────▼─────────────────────────────────┐
+│              WP Forge Agent (dsh)                   │
+│    Senior WordPress developer persona               │
+│    Knows FSE, security standards, Gutenberg         │
+└──────────┬──────────────────┬───────────────────────┘
+           │                  │
+┌──────────▼──────┐  ┌────────▼───────────────────────┐
+│  wp-forge-tools │  │      mcp-wordpress              │
+│  (local MCP)    │  │  (REST API — optional)          │
+│                 │  │                                 │
+│ • scaffold FSE  │  │ • posts / pages / media         │
+│ • lint PHP WASM │  │ • themes / plugins / menus      │
+│ • WP Playground │  │ • users / settings / taxonomies │
+│ • package .zip  │  │ • 50+ WordPress tools           │
+└─────────────────┘  └─────────────────────────────────┘
 ```
 
 ---
 
-## 🛠 WordPress MCP Server Tooling
+## WordPress Agent Skills
 
-The dedicated Model Context Protocol server (`packages/wp-mcp-server`) provides autonomous agents with purpose-built WordPress primitives:
+The WP Forge agent loads two specialized skill sets automatically:
 
-| Tool Name | Parameters | Purpose |
-| :--- | :--- | :--- |
-| `wp_scaffold_theme` | `themeName`, `slug`, `author`, `description`, `targetDir` | Generates standard FSE structure: `style.css`, `theme.json` (v3), `functions.php`, `templates/index.html`, `parts/header.html`, `parts/footer.html`, and `patterns/`. |
-| `check_php_syntax` | `filePath` | Runs non-destructive PHP syntax checks (`php -l`). Automatically falls back to `@wp-playground/cli php -- -l` WebAssembly runner if no host PHP is detected. |
-| `verify_in_playground`| `themePath`, `port` (default: 8088), `timeoutMs` | Headlessly mounts the theme in `@wp-playground/cli`, polls the server until online, verifies an `HTTP 200 OK` response, and audits stdout/stderr for fatal errors or missing assets. |
-| `finish_task` | `themePath`, `outputZipPath` | Executes code standards audit (FSE hierarchy, nonces, escaping) and compiles a distributable production archive (`dist/site.zip`). |
+### `wordpress-fse-theme`
+Rules for building modern Full Site Editing (FSE) block themes:
+- `theme.json` v3 with semantic design tokens, fluid typography, color palettes
+- Gutenberg block templates (`.html`) — never classic PHP in templates
+- Custom Post Types with `show_in_rest: true` for Block Editor compatibility
+- Block patterns, template parts, query loops
 
----
-
-## 🧠 Agent Skills & Coding Standards
-
-WP-Harness includes pre-configured autonomous skills in `skills/` (and automatically synced to `.agents/skills/`):
-
-### 1. `wordpress-fse-theme`
-- **Block Templates**: Standard HTML template markup using valid Gutenberg comments (`<!-- wp:template-part {"slug":"header"} /-->`, `<!-- wp:group {"layout":{"type":"constrained"}} -->`).
-- **`theme.json` v3**: Semantic design tokens (color palettes, fluid typography, spacing presets, shadow definitions, and block-level style overrides).
-- **Block Patterns**: PHP pattern registration via `register_block_pattern()` with category definitions and contextual keywords.
-
-### 2. `wordpress-security-and-verification`
-- **Output Escaping**: Mandatory usage of `esc_html()`, `esc_attr()`, `esc_url()`, and `wp_kses_post()`. Never raw `echo $var;`.
-- **Request Verification**: Verification of nonces using `check_admin_referer()` or `wp_verify_nonce()`.
-- **Access Control**: Capability checks (`current_user_can()`) before performing privileged operations.
-- **Zero Deprecations**: Avoids legacy shortcodes, PHP 4 constructors, and outdated widget APIs.
+### `wordpress-security-and-verification`
+Mandatory security standards enforced on all generated code:
+- Output: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`
+- Input: `sanitize_text_field()`, `absint()`, `wp_unslash()`
+- Forms: `wp_nonce_field()` + `check_admin_referer()` on every submit
+- DB: `$wpdb->prepare()` on every dynamic query
+- Auth: `current_user_can()` before every privileged action
+- **No task is marked done without WP Playground verification**
 
 ---
 
-## 🧪 Autonomous Verification Pipeline
+## Repository Structure
 
-WP-Harness includes an automated end-to-end benchmark suite:
+```
+wp-harness/
+├── apps/
+│   └── cli/                      # DeepSeek Harness CLI (lib/bin.js)
+├── packages/
+│   ├── preset/agent-presets/
+│   │   └── presets/wp-forge/     # WP Forge agent preset
+│   │       ├── preset.yml        # Preset metadata
+│   │       ├── agent.cordis.yml  # Plugin composition
+│   │       └── skills/           # WordPress FSE + Security skills
+│   ├── universal-model-router/   # Multi-model gateway (15 providers)
+│   └── wp-mcp-server/            # WordPress MCP tools (scaffold, lint, sandbox)
+├── .dsh/profiles/wp-forge/       # Profile config (MCP servers, branding)
+├── start-wp-forge.sh             # One-click launch script
+├── .env.wp-forge                 # API key template
+└── test-autonomous-wp.ts         # End-to-end verification suite
+```
+
+---
+
+## Run the verification suite
 
 ```bash
 pnpm test:wp
 ```
 
-### What Happens Under the Hood:
-
-1. **Scaffold**: Generates a complete Italian Restaurant block theme (`wp-harness-demo`) with responsive navigation, hero banner, menu catalog pattern, and reservation form.
-2. **Lint**: Audits every PHP script using `@wp-playground/cli`'s WebAssembly PHP 8.3 engine.
-3. **Sandbox Boot**: Starts an ephemeral WordPress 6.7 environment via:
-   ```bash
-   npx @wp-playground/cli server --port 8088 --auto-mount /path/to/theme --verbosity normal
-   ```
-4. **Health Check**: Pings `http://127.0.0.1:8088`, asserts `HTTP 200 OK`, checks for theme activation, and confirms absence of PHP warnings or fatal errors.
-5. **Package**: Generates a standalone, distributable `dist/site.zip` ready for direct upload to any live WordPress site.
+Scaffolds a complete Italian Restaurant theme, lints PHP via WebAssembly, boots it in WP Playground, asserts HTTP 200 + zero PHP errors, and exports `dist/site.zip`.
 
 ---
 
-## 💻 CLI & Web UI Usage
-
-### 1. Interactive Web Dashboard
-
-Launch the Cordis-powered Web UI:
+## Development
 
 ```bash
-node apps/cli/lib/bin.js web --port 3888
-# or
-pnpm dsh web --port 3888
-```
+# Build all packages
+pnpm run build
 
-Open your browser at `http://127.0.0.1:3888`. The dashboard provides real-time tool visualization, multi-turn agent conversations, and diff inspection.
+# Build only the WordPress MCP server
+pnpm --filter @wp-harness/wp-mcp-server build
 
-### 2. Headless Autonomous Execution
+# Run WordPress verification pipeline
+pnpm test:wp
 
-Run tasks directly from the command line:
-
-```bash
-node apps/cli/lib/bin.js run "Create an ultra-modern portfolio block theme for an architectural firm with dark mode support and interactive project grid."
-```
-
----
-
-## 📁 Repository Structure
-
-```
-wp-harness/
-├── apps/
-│   └── cli/                      # DeepSeek Harness CLI entry point (lib/bin.js)
-├── packages/
-│   ├── client/                   # Core agent client components
-│   ├── core/                     # Cordis orchestration engine & agent lifecycle
-│   ├── host/                     # Host OS bindings & native system integration
-│   ├── preset/                   # Agent presets & pre-configured behaviors
-│   ├── universal-model-router/   # Multi-model gateway (DeepSeek, Claude, OpenAI, Ollama)
-│   │   ├── src/router.ts         # Model routing and fallback logic
-│   │   └── src/patcher.ts        # Cordis profile YAML generator
-│   └── wp-mcp-server/            # WordPress Model Context Protocol Server
-│       ├── src/server.ts         # MCP Server definition
-│       └── src/tools/            # Scaffold, PHP WASM lint, Playground & Zip tools
-├── skills/
-│   ├── wordpress-fse-theme/      # FSE theme architecture skill & guidelines
-│   └── wordpress-security/       # Security, escaping, nonces & verification skill
-├── .agents/skills/               # Active agent runtime skills directory
-├── test-autonomous-wp.ts         # Autonomous end-to-end verification pipeline
-├── tsdown.config.ts              # Monorepo build and bundling configuration
-├── pnpm-workspace.yaml           # pnpm multi-package definitions
-└── .env.example                  # Multi-model environment variable template
+# Inspect the WP Forge profile configuration
+node apps/cli/lib/bin.js wp-forge --dump-config
 ```
 
 ---
 
-## 🔒 Security & Quality Assurance
+## License & Credits
 
-- **Zero Credential Exposure**: Never commit `.env` or sensitive API keys. CI pipelines and git hooks inspect commits with regex filters (`api_key|token|secret|password`).
-- **Sandboxed Execution**: Autonomous verification is performed within an ephemeral WebAssembly container without touching host files or network ports beyond localhost.
-- **Sanitized Outputs**: WordPress themes produced by WP-Harness strictly adhere to WordPress VIP coding guidelines and the WordPress.org Theme Review Standards.
+MIT License — [LICENSE](LICENSE)
 
----
-
-## 🤝 Attribution & License
-
-WP-Harness is open-source software licensed under the **[MIT License](LICENSE)**.
-
-### Acknowledgments
-- **[DeepSeek AI](https://deepseek.com)**: For the groundbreaking [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) agent architecture.
-- **[Cordiverse](https://github.com/cordiverse/cordis)**: For the spatiotemporal composability plugin framework.
-- **[WordPress Playground](https://wordpress.github.io/wordpress-playground/)**: For the WebAssembly WordPress runtime enabling zero-install sandbox verification.
+Built on top of:
+- **[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)** — the open-source agent framework
+- **[mcp-wordpress](https://github.com/docdyhr/mcp-wordpress)** — 50+ WordPress MCP tools
+- **[WordPress Playground](https://wordpress.github.io/wordpress-playground/)** — WebAssembly WordPress runtime
 
 ---
 
-*Maintained by [Moisés Valero](https://github.com/moisesvalero).*
+*Maintained by [Moisés Valero](https://github.com/moisesvalero)*
