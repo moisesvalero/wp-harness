@@ -1,5 +1,29 @@
 # AGENTS.md
 
+# WP-HARNESS AUTONOMOUS WORDPRESS AGENT DIRECTIVES
+
+WP-Harness is an autonomous coding harness specialized for WordPress engineering, integrating DeepSeek Harness, universal multi-model routing, WordPress MCP tooling, and ephemeral WP Playground verification.
+
+## 1. Strict WordPress Coding & Architecture Rules
+- **Modern Full Site Editing (FSE)**: Themes MUST be built as Block Themes using `theme.json` v3, standard `style.css` header, and HTML block templates (`templates/index.html`, `parts/header.html`, `parts/footer.html`).
+- **Security Invariants**:
+  - Nonces: Every state change, form handler, and AJAX endpoint MUST verify nonces via `wp_verify_nonce` or `check_admin_referer`.
+  - Capabilities: Privileged actions MUST verify user permissions with `current_user_can(...)`.
+  - Input Sanitization: All `$_POST`, `$_GET`, `$_REQUEST` values MUST be unslashed and sanitized (`sanitize_text_field`, `sanitize_email`, `absint`, `wp_unslash`).
+  - Output Escaping: Dynamic outputs in HTML MUST be escaped using `esc_html`, `esc_attr`, `esc_url`, or `wp_kses_post`. Never echo raw variables.
+
+## 2. WordPress MCP Tools (`packages/wp-mcp-server`)
+Agents have access to four specialized tools:
+1. `wp_scaffold_theme`: Scaffolds a complete modern Block Theme (`theme.json` v3, `style.css`, `templates/index.html`, `functions.php`).
+2. `check_php_syntax`: Runs `php -l` and parses syntax errors into actionable JSON.
+3. `verify_in_playground`: Mounts the workspace to `@wp-playground/cli` in-memory, executes a headless healthcheck, and asserts `HTTP 200` with ZERO PHP Fatal Errors.
+4. `finish_task`: The terminal stopping tool that validates all project files, verifies against WordPress Coding Standards, and exports the site to `dist/site.zip`.
+
+## 3. Strict Verification & Stopping Criterion
+**PROHIBITION**: You are strictly prohibited from declaring a task finished, outputting completion messages, or calling `finish_task` without FIRST executing `verify_in_playground` and confirming `HTTP 200 OK` with zero fatal errors.
+
+---
+
 DeepSeek Harness is an all-plugin Cordis agent harness. Read [docs/architecture.md](docs/architecture.md) before changing `packages/`; follow [docs/AGENTS.md](docs/AGENTS.md) for documentation.
 
 ## Pre-stable APIs and released Session data
