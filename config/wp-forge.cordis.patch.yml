@@ -1,0 +1,108 @@
+# WP Forge — Profile patch layer
+
+# Deshabilitar DeepSeek oficial por defecto para usar OpenRouter
+- id: llm-deepseek
+  disabled: true
+
+# Configurar el modelo por defecto del agente
+- id: agent-default-model
+  config:
+    provider: openrouter
+    model: openai/gpt-6-astra
+
+# Configurar wp-forge como preset de agente por defecto
+- id: agent-presets
+  config:
+    default: wp-forge
+
+# Configurar OpenRouter con la colección de modelos gratuitos y modelos punteros de 2026
+- id: llm-pi-ai
+  config:
+    providers:
+      openrouter:
+        displayName: OpenRouter
+        apiKeyEnv: OPENROUTER_API_KEY
+        api: openai-completions
+        baseURL: https://openrouter.ai/api/v1
+        defaultMaxTokens: 4096
+        models:
+          # --- MODELOS PRINCIPALES DE ÚLTIMA GENERACIÓN (2026) ---
+          - id: openai/gpt-6-astra
+            name: OpenAI GPT-6 Astra (Default)
+            contextWindow: 1050000
+            maxOutputTokens: 4096
+          - id: openai/gpt-6-astra-pro
+            name: OpenAI GPT-6 Astra Pro
+            contextWindow: 1050000
+            maxOutputTokens: 4096
+          - id: anthropic/claude-fable-5.1
+            name: Anthropic Claude Fable 5.1
+            contextWindow: 1000000
+            maxOutputTokens: 4096
+          - id: anthropic/claude-opus-5
+            name: Anthropic Claude Opus 5
+            contextWindow: 1000000
+            maxOutputTokens: 4096
+          - id: google/gemini-3.8-flash
+            name: Google Gemini 3.8 Flash
+            contextWindow: 1048576
+            maxOutputTokens: 4096
+          - id: google/gemini-3.7-flash
+            name: Google Gemini 3.7 Flash
+            contextWindow: 1048576
+            maxOutputTokens: 4096
+          - id: deepseek/deepseek-v4.1-flash
+            name: DeepSeek V4.1 Flash
+            contextWindow: 1048576
+            maxOutputTokens: 4096
+          - id: deepseek/deepseek-v4-pro-0813
+            name: DeepSeek V4 Pro
+            contextWindow: 1048576
+            maxOutputTokens: 4096
+          - id: qwen/qwen3.8-flash
+            name: Qwen 3.8 Flash
+            contextWindow: 1000000
+            maxOutputTokens: 4096
+
+          # --- MODELOS GRATUITOS (OpenRouter Free Collection - Costo $0) ---
+          - id: openrouter/free
+            name: OpenRouter Free (Auto-Router)
+            contextWindow: 200000
+            maxOutputTokens: 4096
+          - id: deepseek/deepseek-v4-flash-0731:free
+            name: DeepSeek V4 Flash (Free - 1M Context)
+            contextWindow: 1048576
+            maxOutputTokens: 4096
+          - id: cohere/north-mini-code:free
+            name: Cohere North Mini Code (Free)
+            contextWindow: 256000
+            maxOutputTokens: 4096
+          - id: nvidia/nemotron-3.5-lightning:free
+            name: Nemotron 3.5 Lightning (Free - 1M Context)
+            contextWindow: 1000000
+            maxOutputTokens: 4096
+
+# Añadir herramientas MCP de WordPress
+- insert:
+    # MCP local: wp-forge-tools (scaffold FSE, lint PHP WebAssembly, WP Playground)
+    - id: mcp-wp-forge-tools
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: wp-forge-tools
+        transport: stdio
+        command: node
+        args: ['/Users/moisesvalerosanchez/Proyectos Web/webs/wp-harness/packages/wp-mcp-server/dist/index.js']
+
+    # MCP opcional para WordPress real (solo activo si hay URL configurada)
+    - id: mcp-wordpress
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js "!process.env.WORDPRESS_SITE_URL"
+      config:
+        serverName: wordpress
+        transport: stdio
+        command: npx
+        args: ['-y', 'mcp-wordpress']
+        env:
+          WORDPRESS_SITE_URL: !!js "process.env.WORDPRESS_SITE_URL || ''"
+          WORDPRESS_USERNAME: !!js "process.env.WORDPRESS_USERNAME || ''"
+          WORDPRESS_APP_PASSWORD: !!js "process.env.WORDPRESS_APP_PASSWORD || ''"

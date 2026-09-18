@@ -18,7 +18,7 @@ clear
 echo "============================================================="
 echo "🚀 DEEPSEEK HARNESS (ANTIGRAVITY 2.0) — WORDPRESS AGENT WORKBENCH"
 echo "============================================================="
-echo "📍 Modelo: OpenRouter activo"
+echo "📍 Modelos 2026: OpenRouter (GPT-6 Astra / Claude Fable 5.1 / Opus 5 / Gemini 3.8 / DeepSeek V4.1 / Gratuitos $0)"
 echo "📍 Agente: WP Forge (Full Site Editing, theme.json v3, Security)"
 echo "📍 Workspace: $SCRIPT_DIR/workspace"
 echo "============================================================="
@@ -26,4 +26,4 @@ echo ""
 echo "Iniciando servidor y abriendo navegador..."
 echo ""
 
-exec node "$SCRIPT_DIR/apps/cli/lib/bin.js" web
+exec node "$SCRIPT_DIR/apps/cli/lib/bin.js" wp-forge

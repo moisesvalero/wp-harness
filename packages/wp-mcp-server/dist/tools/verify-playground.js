@@ -69,10 +69,13 @@ export async function verifyInPlayground(options) {
                     redirect: 'follow', // Follow 302 installs or redirects
                 });
                 if (response.status === 200 || response.status === 302) {
-                    finalStatus = response.status;
-                    finalHtml = await response.text();
-                    isReady = true;
-                    break;
+                    const html = await response.text();
+                    if (html.trim().length >= 50) {
+                        finalStatus = response.status;
+                        finalHtml = html;
+                        isReady = true;
+                        break;
+                    }
                 }
             }
             catch {

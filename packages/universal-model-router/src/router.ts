@@ -116,13 +116,13 @@ export const PROVIDER_REGISTRY: Record<SupportedProvider, ProviderDefinition> = 
   openrouter: {
     id: 'openrouter',
     displayName: 'OpenRouter Universal Gateway',
-    defaultModel: 'deepseek/deepseek-r1',
-    reasoningModel: 'anthropic/claude-3.7-sonnet',
+    defaultModel: 'openai/gpt-6-astra',
+    reasoningModel: 'anthropic/claude-fable-5.1',
     primaryEnvKey: 'OPENROUTER_API_KEY',
     baseURL: 'https://openrouter.ai/api/v1',
     protocol: 'openai-completions',
-    contextWindow: 131_072,
-    description: 'Unified multi-provider proxy aggregating 200+ models with dynamic price/uptime routing',
+    contextWindow: 1_050_000,
+    description: 'Unified gateway featuring 2026 flagships (GPT-6 Astra, Claude Fable 5.1, Gemini 3.8, DeepSeek V4.1) and Free collection',
   },
   together: {
     id: 'together',

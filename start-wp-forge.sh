@@ -18,11 +18,11 @@ fi
 echo "============================================================="
 echo "🚀 DEEPSEEK HARNESS (ANTIGRAVITY 2.0) — WORDPRESS AGENT WORKBENCH"
 echo "============================================================="
-echo "📍 Modelo activo: OpenRouter (GPT-4o Mini / Claude 3.7 / Gemini / DeepSeek)"
+echo "📍 Modelos 2026: OpenRouter (GPT-6 Astra / Claude Fable 5.1 / Opus 5 / Gemini 3.8 / DeepSeek V4.1 / Gratuitos $0)"
 echo "📍 Agente activo: WP Forge (Full Site Editing, theme.json v3, Security)"
 echo "📍 Workspace: $SCRIPT_DIR/workspace"
 echo "============================================================="
 echo ""
 
-# Arrancar DeepSeek Harness Web UI nativa
-exec node "$SCRIPT_DIR/apps/cli/lib/bin.js" web
+# Arrancar DeepSeek Harness Web UI nativa con perfil WP Forge
+exec node "$SCRIPT_DIR/apps/cli/lib/bin.js" wp-forge

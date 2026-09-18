@@ -16,13 +16,18 @@ export function FishLogo({ size = 24, className }: IconProps) {
   return (
     <svg
       width={size}
-      height={(size * FISH_LOGO_VIEWBOX.height) / FISH_LOGO_VIEWBOX.width}
+      height={size}
       className={className}
-      viewBox={`0 0 ${FISH_LOGO_VIEWBOX.width} ${FISH_LOGO_VIEWBOX.height}`}
+      viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
     >
-      <path d={FISH_LOGO_PATH} fill="currentColor" />
+      <circle cx="12" cy="12" r="11" fill="#2271b1" />
+      <path
+        d="M12 2C6.48 2 2 6.48 2 12c0 1.94.55 3.75 1.5 5.28l4.47-12.28c.37-1.02 1.34-1.67 2.43-1.67h.4c1.09 0 2.06.65 2.43 1.67l2.3 6.3 1.8-4.9c.37-1.02 1.34-1.67 2.43-1.67h.3c1.09 0 2.06.65 2.43 1.67l4.47 12.28C21.45 15.75 22 13.94 22 12c0-5.52-4.48-10-10-10zm0 18c-2.3 0-4.38-.97-5.85-2.53l3.4-9.37 2.45 6.7c.37 1.02 1.34 1.67 2.43 1.67h.4c1.09 0 2.06-.65 2.43-1.67l1.45-3.95 3.4 9.37C16.38 19.03 14.3 20 12 20z"
+        fill="#ffffff"
+      />
+      <circle cx="19" cy="5" r="3" fill="#e0a824" stroke="#1d2327" strokeWidth="1" />
     </svg>
   )
 }
