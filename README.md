@@ -133,7 +133,7 @@ flowchart TD
 
 ## 🔑 Universal Multi-Model Configuration
 
-WP-Harness includes a dynamic multi-provider routing layer located in `packages/universal-model-router`. It decouples the agent from single-vendor lock-in.
+WP-Harness includes a dynamic, zero-lockin multi-provider routing layer located in `packages/universal-model-router`. It auto-detects ambient API keys and routes agent generation tasks to the best-suited foundation model.
 
 ### 1. Configure Environment Variables
 
@@ -143,39 +143,41 @@ Copy `.env.example` to `.env` in the root directory:
 cp .env.example .env
 ```
 
-Populate the keys for your preferred provider(s):
+Populate the key for your preferred provider (or configure multiple for automatic fallback).
 
-```ini
-# --- Universal Multi-Model Provider Keys ---
-DEEPSEEK_API_KEY=sk-your-deepseek-key
-OPENROUTER_API_KEY=sk-or-v1-your-openrouter-key
-ANTHROPIC_API_KEY=sk-ant-api03-your-anthropic-key
-OPENAI_API_KEY=sk-proj-your-openai-key
+### 2. Comprehensive 15-Provider Capabilities Matrix
 
-# --- Local Ollama Support ---
-OLLAMA_BASE_URL=http://127.0.0.1:11434
+| Provider | Recommended Coding Model | Reasoning / Planning Model | Environment Variable | Protocol & Context | Key Strength |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Google Gemini** | `gemini-2.5-pro` | `gemini-2.5-pro` | `GEMINI_API_KEY` | OpenAI Comp. (1M+) | Ultra-long 1M+ context window & multimodal reasoning |
+| **Mistral / Codestral** | `codestral-latest` | `mistral-large-latest` | `MISTRAL_API_KEY` | OpenAI Comp. (256k) | Specialized code generation, FSE block patterns & multilingual |
+| **Cohere Command** | `command-r-plus-08-2024` | `command-r-plus` | `COHERE_API_KEY` | OpenAI Comp. (128k) | Command R+ enterprise agent planning and structured tool use |
+| **Groq LPU** | `llama-3.3-70b-versatile` | `deepseek-r1-distill-llama-70b` | `GROQ_API_KEY` | OpenAI Comp. (128k) | Ultra-fast LPU inference delivering near-instant multi-turn loops |
+| **Anthropic Claude** | `claude-3-7-sonnet-20250219` | `claude-3-7-sonnet` (thinking) | `ANTHROPIC_API_KEY` | Anthropic Msg. (200k) | Hybrid thinking, architectural refactors & benchmark coding leader |
+| **OpenAI** | `gpt-4o` | `o3-mini` / `o1` | `OPENAI_API_KEY` | OpenAI Comp. (128k) | Flagship reasoning and deterministic JSON structured outputs |
+| **OpenRouter** | `deepseek/deepseek-r1` | `anthropic/claude-3.7-sonnet` | `OPENROUTER_API_KEY` | OpenAI Comp. (Dynamic) | Aggregator gateway across 200+ models with dynamic failover |
+| **Together AI** | `deepseek-ai/DeepSeek-V3` | `deepseek-ai/DeepSeek-R1` | `TOGETHER_API_KEY` | OpenAI Comp. (128k) | High-speed serverless cloud inference for open-weight models |
+| **xAI Grok** | `grok-2-1212` | `grok-2-vision-1212` | `XAI_API_KEY` | OpenAI Comp. (128k) | Frontier Grok reasoning, vision, and real-time intelligence |
+| **Cerebras** | `llama-3.3-70b` | `llama-3.3-70b` | `CEREBRAS_API_KEY` | OpenAI Comp. (128k) | Wafer-Scale cluster with world-record generation throughput |
+| **Fireworks AI** | `accounts/fireworks/models/deepseek-v3` | `accounts/fireworks/models/deepseek-r1` | `FIREWORKS_API_KEY` | OpenAI Comp. (128k) | Enterprise serverless hosting for DeepSeek and Qwen 2.5 Coder |
+| **Perplexity** | `sonar-pro` | `sonar-reasoning-pro` | `PERPLEXITY_API_KEY` | OpenAI Comp. (128k) | Live web-grounded Sonar models for real-time WP core research |
+| **DeepInfra** | `deepseek-ai/DeepSeek-V3` | `deepseek-ai/DeepSeek-R1` | `DEEPINFRA_API_KEY` | OpenAI Comp. (128k) | Cost-effective GPU cloud inference for open-source LLMs |
+| **Local Ollama** | `qwen2.5-coder:32b` | `deepseek-r1:32b` | `OLLAMA_BASE_URL` | OpenAI Comp. (32k) | 100% offline, privacy-first local models (zero cloud API cost) |
+| **DeepSeek Official** | `deepseek-chat` (V3) | `deepseek-reasoner` (R1) | `DEEPSEEK_API_KEY` | Native SSE / OpenAI (64k) | Official direct provider with native high-performance SSE stream |
 
-# --- Routing Preferences ---
-DEFAULT_MODEL_PROVIDER=deepseek  # Options: deepseek, openrouter, anthropic, openai, ollama
-DEFAULT_MODEL_NAME=deepseek-chat
-```
+### 3. CLI Inspection & Dynamic Cordis Profile Patching
 
-### 2. Provider Capabilities & Fallback Matrix
-
-| Provider | Recommended Model | Reasoning / Planning Model | Context Window |
-| :--- | :--- | :--- | :--- |
-| **DeepSeek** | `deepseek-chat` (V3) | `deepseek-reasoner` (R1) | 64k tokens |
-| **Anthropic** | `claude-3-7-sonnet` | `claude-3-7-sonnet-thinking` | 200k tokens |
-| **OpenRouter** | `anthropic/claude-3.5-sonnet` | `deepseek/deepseek-r1` | Dynamic |
-| **OpenAI** | `gpt-4o` | `o3-mini` / `o1` | 128k - 200k |
-| **Ollama** | `qwen2.5-coder:32b` | `deepseek-r1:32b` | Local / Offline |
-
-### 3. Dynamic Cordis Profile Patching
-
-Apply your configured model settings to the active Cordis agent profile:
+Inspect registered providers or check which environment keys are configured:
 
 ```bash
-pnpm --filter @wp-harness/universal-model-router route --patch
+# List all 15 supported providers and default models
+node packages/universal-model-router/dist/cli.js --list
+
+# Audit which provider API keys are active in your current shell
+node packages/universal-model-router/dist/cli.js --status
+
+# Generate dynamic Cordis YAML profile patch
+node packages/universal-model-router/dist/cli.js --patch
 ```
 
 ---

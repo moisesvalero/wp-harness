@@ -1,1 +1,1 @@
-{"version":3,"file":"cordis-overlay.d.ts","sourceRoot":"","sources":["../../src/cordis-overlay.ts"],"names":[],"mappings":"AAAA,OAAO,EAA2B,gBAAgB,EAAE,MAAM,aAAa,CAAC;AAExE;;;GAGG;AACH,wBAAgB,wBAAwB,CAAC,KAAK,GAAE,gBAA4C,GAAG,MAAM,CAuCpG"}
+{"version":3,"file":"cordis-overlay.d.ts","sourceRoot":"","sources":["../src/cordis-overlay.ts"],"names":[],"mappings":"AAAA,OAAO,EAA2B,gBAAgB,EAAE,MAAM,aAAa,CAAA;AAEvE;;;GAGG;AACH,wBAAgB,wBAAwB,CAAC,KAAK,GAAE,gBAA4C,GAAG,MAAM,CA+BpG"}

@@ -133,7 +133,7 @@ flowchart TD
 
 ## 🔑 Configuración Multi-Modelo Universal
 
-WP-Harness integra una capa de enrutamiento desacoplada en `packages/universal-model-router` para evitar el bloqueo con un único proveedor de IA.
+WP-Harness integra una capa de enrutamiento desacoplada en `packages/universal-model-router` que elimina el bloqueo de proveedor. Detecta automáticamente las API keys del entorno y enruta las tareas de generación autónoma al modelo fundacional más adecuado.
 
 ### 1. Variables de Entorno
 
@@ -143,39 +143,41 @@ Copia la plantilla `.env.example` a `.env` en la raíz del proyecto:
 cp .env.example .env
 ```
 
-Configura tus claves según los proveedores que desees utilizar:
+Configura las credenciales de tu proveedor preferido (o define varias para disponer de respaldo automático).
 
-```ini
-# --- Claves de Proveedores Multi-Modelo ---
-DEEPSEEK_API_KEY=sk-tu-clave-de-deepseek
-OPENROUTER_API_KEY=sk-or-v1-tu-clave-de-openrouter
-ANTHROPIC_API_KEY=sk-ant-api03-tu-clave-de-anthropic
-OPENAI_API_KEY=sk-proj-tu-clave-de-openai
+### 2. Matriz Exhaustiva de Capacidades (15 Proveedores)
 
-# --- Soporte para Ollama Local ---
-OLLAMA_BASE_URL=http://127.0.0.1:11434
+| Proveedor | Modelo Recomendado (Código) | Modelo de Razonamiento / Planificación | Variable de Entorno | Protocolo y Contexto | Ventaja Clave |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Google Gemini** | `gemini-2.5-pro` | `gemini-2.5-pro` | `GEMINI_API_KEY` | OpenAI Comp. (1M+) | Ventana masiva de 1M+ tokens y razonamiento multimodal |
+| **Mistral / Codestral** | `codestral-latest` | `mistral-large-latest` | `MISTRAL_API_KEY` | OpenAI Comp. (256k) | Especializado en código, patrones de bloques FSE y multilingüe |
+| **Cohere Command** | `command-r-plus-08-2024` | `command-r-plus` | `COHERE_API_KEY` | OpenAI Comp. (128k) | Command R+ razonamiento empresarial y planificación multi-paso |
+| **Groq LPU** | `llama-3.3-70b-versatile` | `deepseek-r1-distill-llama-70b` | `GROQ_API_KEY` | OpenAI Comp. (128k) | Inferencia ultra-rápida LPU para ciclos autónomos casi instantáneos |
+| **Anthropic Claude** | `claude-3-7-sonnet-20250219` | `claude-3-7-sonnet` (thinking) | `ANTHROPIC_API_KEY` | Anthropic Msg. (200k) | Pensamiento híbrido, precisión en refactors y liderazgo en código |
+| **OpenAI** | `gpt-4o` | `o3-mini` / `o1` | `OPENAI_API_KEY` | OpenAI Comp. (128k) | Razonamiento de referencia y salidas estructuradas deterministas |
+| **OpenRouter** | `deepseek/deepseek-r1` | `anthropic/claude-3.7-sonnet` | `OPENROUTER_API_KEY` | OpenAI Comp. (Dinámico) | Pasarela agregadora a más de 200 modelos con conmutación dinámica |
+| **Together AI** | `deepseek-ai/DeepSeek-V3` | `deepseek-ai/DeepSeek-R1` | `TOGETHER_API_KEY` | OpenAI Comp. (128k) | Inferencia serverless en la nube para modelos de pesos abiertos |
+| **xAI Grok** | `grok-2-1212` | `grok-2-vision-1212` | `XAI_API_KEY` | OpenAI Comp. (128k) | Modelos Grok de frontera con alta velocidad y capacidades de visión |
+| **Cerebras** | `llama-3.3-70b` | `llama-3.3-70b` | `CEREBRAS_API_KEY` | OpenAI Comp. (128k) | Clúster a escala de oblea con velocidad récord mundial de tokens |
+| **Fireworks AI** | `accounts/fireworks/models/deepseek-v3` | `accounts/fireworks/models/deepseek-r1` | `FIREWORKS_API_KEY` | OpenAI Comp. (128k) | Motor de inferencia para producción de DeepSeek y Qwen Coder |
+| **Perplexity** | `sonar-pro` | `sonar-reasoning-pro` | `PERPLEXITY_API_KEY` | OpenAI Comp. (128k) | Modelos Sonar con búsqueda activa en web para documentación viva |
+| **DeepInfra** | `deepseek-ai/DeepSeek-V3` | `deepseek-ai/DeepSeek-R1` | `DEEPINFRA_API_KEY` | OpenAI Comp. (128k) | Alojamiento serverless en GPU de alto rendimiento y bajo coste |
+| **Local Ollama** | `qwen2.5-coder:32b` | `deepseek-r1:32b` | `OLLAMA_BASE_URL` | OpenAI Comp. (32k) | Modelos 100% locales, privados y sin coste de llamadas a API |
+| **DeepSeek Oficial** | `deepseek-chat` (V3) | `deepseek-reasoner` (R1) | `DEEPSEEK_API_KEY` | Native SSE / OpenAI (64k) | Proveedor oficial directo con streaming nativo SSE de alto rendimiento |
 
-# --- Preferencias de Enrutamiento ---
-DEFAULT_MODEL_PROVIDER=deepseek  # Opciones: deepseek, openrouter, anthropic, openai, ollama
-DEFAULT_MODEL_NAME=deepseek-chat
-```
+### 3. Inspección en CLI y Parcheo Dinámico de Perfiles en Cordis
 
-### 2. Matriz de Proveedores y Capacidades
-
-| Proveedor | Modelo Recomendado | Modelo de Razonamiento / Planificación | Ventana de Contexto |
-| :--- | :--- | :--- | :--- |
-| **DeepSeek** | `deepseek-chat` (V3) | `deepseek-reasoner` (R1) | 64k tokens |
-| **Anthropic** | `claude-3-7-sonnet` | `claude-3-7-sonnet-thinking` | 200k tokens |
-| **OpenRouter** | `anthropic/claude-3.5-sonnet` | `deepseek/deepseek-r1` | Dinámica |
-| **OpenAI** | `gpt-4o` | `o3-mini` / `o1` | 128k - 200k |
-| **Ollama** | `qwen2.5-coder:32b` | `deepseek-r1:32b` | Local / Offline |
-
-### 3. Parcheo Dinámico de Perfiles en Cordis
-
-Aplica la configuración seleccionada al perfil activo de Cordis:
+Inspecciona proveedores soportados o audita qué credenciales están presentes en tu terminal:
 
 ```bash
-pnpm --filter @wp-harness/universal-model-router route --patch
+# Listar los 15 proveedores y modelos por defecto
+node packages/universal-model-router/dist/cli.js --list
+
+# Auditar qué API keys están configuradas en tu entorno actual
+node packages/universal-model-router/dist/cli.js --status
+
+# Generar el parche dinámico de perfil YAML para Cordis
+node packages/universal-model-router/dist/cli.js --patch
 ```
 
 ---

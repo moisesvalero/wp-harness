@@ -1,41 +1,35 @@
 import { resolveActiveModelRoute } from './router.js';
 /**
- * Generates a dynamic Cordis YAML profile patch for DeepSeek Harness.
+ * Generates a dynamic Cordis YAML profile patch for DeepSeek Harness / WP-Harness.
  * Routes the harness agent loop to the active provider without hardcoding.
  */
 export function generateCordisModelPatch(route = resolveActiveModelRoute()) {
-    const providerKey = route.provider;
-    const isCustomOllama = route.provider === 'ollama';
-    const providerConfig = {};
-    if (route.apiKeyEnv) {
-        providerConfig.apiKeyEnv = route.apiKeyEnv;
-    }
-    if (route.baseURL) {
-        providerConfig.baseURL = route.baseURL;
-    }
-    if (isCustomOllama) {
-        providerConfig.protocol = 'openai-completions';
-    }
+    const isDeepSeekNative = route.provider === 'deepseek';
     return `# ==============================================================================
 # WP-HARNESS DYNAMIC MODEL ROUTING OVERLAY
-# Source: ${route.source} | Provider: ${route.provider} | Model: ${route.model}
+# Provider: ${route.displayName} (${route.provider})
+# Model: ${route.model}
+# Protocol: ${route.protocol}
+# Context Window: ${route.contextWindow.toLocaleString()} tokens
+# Source: ${route.source}
 # ==============================================================================
 - id: llm-deepseek
-  disabled: ${route.provider !== 'deepseek'}
+  disabled: ${!isDeepSeekNative}
 
 - id: llm-pi-ai
   config:
     providers:
-      ${providerKey}:
-        ${route.apiKeyEnv ? `apiKeyEnv: ${route.apiKeyEnv}` : `apiKey: ${route.apiKey || 'anonymous'}`}
-        ${route.baseURL ? `baseURL: "${route.baseURL}"` : ''}
-        ${isCustomOllama ? `protocol: openai-completions` : ''}
+      ${route.provider}:
+        apiKeyEnv: ${route.apiKeyEnv || 'API_KEY'}
+        baseURL: "${route.baseURL}"
+        api: ${route.protocol}
+        defaultContextWindow: ${route.contextWindow}
 
 - id: agent-loop
   config:
     agents:
       - id: main
-        provider: ${providerKey}
+        provider: ${route.provider}
         model: "${route.model}"
         cwd: !!js process.cwd()
 `;
