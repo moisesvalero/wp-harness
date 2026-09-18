@@ -1,0 +1,146 @@
+# WP Forge — Agent preset composition
+# Basado en el preset "standard" con persona y skills especializadas en WordPress.
+
+# ── identity ─────────────────────────────────────────────────────────────────
+
+- id: persona
+  name: '@deepseek-ai/dsh-persona'
+  config:
+    prefix: >-
+      You are WP Forge, a senior WordPress development agent powered by {{model}}.
+      Your mission is to help the user build complete, professional WordPress sites
+      through natural conversation. You always speak in the user's language (Spanish
+      if they write in Spanish, English if they write in English).
+      You are direct and practical. When the user describes what they want, you build
+      it — you don't just explain. You verify everything in WP Playground before
+      declaring any task done. Your working directory is {{cwd}}.
+
+- id: agent-instructions
+  name: '@deepseek-ai/dsh-agent-instructions'
+  config:
+    maxBytes: 65536
+
+# ── shell ─────────────────────────────────────────────────────────────────────
+
+- id: tool-bash
+  name: '@deepseek-ai/dsh-tool-bash'
+  disabled: !!js process.platform === 'win32'
+
+- id: tool-pwsh
+  name: '@deepseek-ai/dsh-tool-pwsh'
+  disabled: !!js process.platform !== 'win32'
+
+# ── filesystem ────────────────────────────────────────────────────────────────
+
+- id: tool-fs
+  name: '@deepseek-ai/dsh-tool-fs'
+
+- id: tool-fs-search
+  name: '@deepseek-ai/dsh-tool-fs-search'
+
+# ── skills (WordPress FSE + Security) ────────────────────────────────────────
+
+- id: skill-filesystem
+  name: '@deepseek-ai/dsh-skill-filesystem'
+
+- id: tool-skill
+  name: '@deepseek-ai/dsh-tool-skill'
+
+# ── goals and planning ────────────────────────────────────────────────────────
+
+- id: tool-goal
+  name: '@deepseek-ai/dsh-tool-goal'
+
+- id: command-goal
+  name: '@deepseek-ai/dsh-command-goal'
+
+- id: planning
+  name: cordis:group
+  group: true
+  isolate:
+    planMode: true
+  config:
+    - id: plan-mode
+      name: '@deepseek-ai/dsh-plan-mode'
+      config:
+        section: |
+              You are in plan mode. Stay in plan mode until exit_plan_mode succeeds.
+              For WordPress tasks: explore the existing codebase or requirements first,
+              then plan the theme/plugin architecture before writing any code.
+              Make the plan decision-complete: file structure, block architecture,
+              security considerations, and verification steps.
+
+# ── compaction ────────────────────────────────────────────────────────────────
+
+- id: compaction
+  name: cordis:group
+  group: true
+  isolate:
+    compaction: true
+    toolResultPruner: true
+  config:
+    - id: compaction-basic
+      name: '@deepseek-ai/dsh-compaction-basic'
+
+    - id: command-compact
+      name: '@deepseek-ai/dsh-command-compact'
+
+    - id: tool-result-pruner
+      name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+      config:
+        thresholdChars: 8192
+        headChars: 4096
+        tailChars: 1024
+
+# ── delegation ────────────────────────────────────────────────────────────────
+
+- id: delegation
+  name: cordis:group
+  group: true
+  isolate:
+    workflowEngine: true
+  config:
+    - id: tool-subagent-control
+      name: '@deepseek-ai/dsh-tool-subagent-control'
+
+    - id: tool-subagent
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: spawn
+        toolName: subagent
+        modelSelectionSettings: true
+        backgroundMode: continuable
+
+    - id: tool-subagent-fork
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: fork
+        toolName: subagent_fork
+        backgroundMode: continuable
+
+    - id: workflow-ptc
+      name: '@deepseek-ai/dsh-workflow-ptc'
+      config:
+        provider: spawn
+
+    - id: tool-workflow
+      name: '@deepseek-ai/dsh-tool-workflow'
+
+# ── remaining tools ───────────────────────────────────────────────────────────
+
+- id: tool-ask-user
+  name: '@deepseek-ai/dsh-tool-ask-user'
+
+- id: tool-todo
+  name: '@deepseek-ai/dsh-tool-todo'
+  config:
+    allowParallelInProgress: true
+
+- id: tool-web
+  name: '@deepseek-ai/dsh-tool-web'
+  config:
+    fetch: true
+    searchTimeoutMs: 60000
+
+- id: present
+  name: '@deepseek-ai/dsh-tool-present'

@@ -1,0 +1,3 @@
+name: WP Forge
+description: Agente experto en WordPress. Construye temas FSE, plugins y sitios completos mediante conversación natural. Incluye soporte para WP Playground (sandbox) y WordPress real vía REST API.
+order: 5
