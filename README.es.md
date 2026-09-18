@@ -82,11 +82,15 @@ GROQ_API_KEY=gsk_...
 
 ### 3. Arrancar
 
+**En macOS (un solo clic):**
+Haz doble clic en `WP Forge.command` desde el Finder.
+
+**O desde la terminal:**
 ```bash
 ./start-wp-forge.sh
 ```
 
-Se abre el navegador automáticamente. Selecciona el preset **WP Forge** y empieza a chatear.
+El navegador se abrirá automáticamente en `http://127.0.0.1:3080/` con el agente **WP Forge** listo para trabajar.
 
 ---
 
@@ -96,6 +100,7 @@ Se abre el navegador automáticamente. Selecciona el preset **WP Forge** y empie
 |---|---|
 | *"Crea un tema de blog con diseño minimalista"* | Genera tema FSE → verifica en WP Playground → entrega `site.zip` |
 | *"Haz una web de restaurante con reservas"* | Genera tema + formulario de reserva + custom post types |
+| *"Crea un tema compatible con WooCommerce"* | Genera tema con plantillas de tienda y bloques de productos |
 | *"Publica un nuevo artículo en mi WordPress"* | Conecta a tu WP vía REST API y crea el post |
 | *"Lista todos mis plugins instalados"* | Consulta tu WordPress y muestra la lista |
 | *"Corrige el error PHP en functions.php"* | Lee el archivo, lo corrige, verifica sintaxis, listo |
@@ -114,23 +119,65 @@ WORDPRESS_APP_PASSWORD=xxxx xxxx xxxx xxxx xxxx xxxx
 
 > **Cómo obtener la contraseña de aplicación:** Admin de WordPress → Usuarios → Tu perfil → Contraseñas de aplicación → Añadir nueva
 
+Una vez configurado, el agente tiene acceso a más de 50 herramientas de gestión de WordPress (entradas, páginas, medios, temas, plugins, menús, usuarios, ajustes y más) mediante el servidor [mcp-wordpress](https://github.com/docdyhr/mcp-wordpress).
+
 ---
 
-## Proveedores LLM soportados
+## 🎯 Selección y cambio de modelo
 
-| Proveedor | Modelos | Variable |
+Tienes total libertad para elegir el modelo que quieras directamente desde la interfaz:
+
+1. **Menú desplegable en el chat (Composer):** En la barra inferior donde escribes los prompts, haz clic en la píldora con el nombre del modelo activo (por defecto: `OpenAI GPT-6 Astra`). Se abrirá el menú desplegable con todos los modelos disponibles.
+   - **Persistencia automática:** El modelo que elijas se guarda automáticamente en tus ajustes como el **modelo por defecto para todas las futuras sesiones**.
+2. **Comando de barra `/model`:** Escribe `/model` en la caja de texto para abrir el buscador rápido y cambiar de modelo con el teclado al instante.
+3. **Panel de Ajustes (⚙️ Settings → Models):** Consulta, personaliza o añade nuevos endpoints de modelos y claves de API en cualquier momento.
+
+---
+
+## Modelos punteros de 2026 y Colección Gratuita
+
+WP Forge cuenta con soporte para **15+ proveedores de IA** y viene preconfigurado con los modelos de última generación de **finales de 2026**, incorporando un límite estricto de `maxOutputTokens: 4096` que erradica por completo los bloqueos por cálculo de saldo `402 Payment Required` en OpenRouter:
+
+### 🌟 Modelos Flagship 2026 (OpenRouter y Directos)
+| Modelo | Ventana de Contexto | Especialidad |
 |---|---|---|
-| **OpenAI** | GPT-4o, o3-mini | `OPENAI_API_KEY` |
-| **Anthropic** | Claude 3.7 Sonnet, Claude 3.5 Haiku | `ANTHROPIC_API_KEY` |
-| **Google** | Gemini 2.5 Pro, Gemini 2.5 Flash | `GOOGLE_API_KEY` |
-| **DeepSeek** | DeepSeek Chat (V3), Reasoner (R1) | `DEEPSEEK_API_KEY` |
+| **OpenAI GPT-6 Astra** *(Por defecto)* | 1.05M tokens | Referencia en programación agentica, razonamiento y arquitectura FSE |
+| **OpenAI GPT-6 Astra Pro** | 1.05M tokens | Plugins complejos full-stack y migraciones de bases de datos |
+| **Anthropic Claude Fable 5.1** | 1.00M tokens | Diseño de arquitectura a gran escala y auditoría exhaustiva |
+| **Anthropic Claude Opus 5** | 1.00M tokens | Razonamiento autónomo en múltiples fases y verificación lógica |
+| **Google Gemini 3.8 Flash** | 1.05M tokens | Generación ultrarrápida con ventana masiva de 1 millón de tokens |
+| **Google Gemini 3.7 Flash** | 1.05M tokens | Flujo agentico multimodal equilibrado de alta velocidad |
+| **DeepSeek V4.1 Flash** | 1.05M tokens | Alto rendimiento en codificación y ejecución continua de herramientas |
+| **DeepSeek V4 Pro** | 1.05M tokens | Máxima precisión en depuración y análisis sintáctico |
+| **Qwen 3.8 Flash** | 1.00M tokens | Especialista en código técnico, patrones de bloques y PHP |
+
+### 🆓 Colección Gratuita de OpenRouter ($0 de Saldo)
+Modelos con coste cero verificados para flujos de trabajo autónomos:
+- `openrouter/free` — Enrutador automático inteligente entre modelos de cuota gratuita
+- `deepseek/deepseek-v4-flash-0731:free` — 1M de contexto con coste cero de tokens
+- `cohere/north-mini-code:free` — Optimizado para código y sintaxis
+- `nvidia/nemotron-3.5-lightning:free` — Inferencia gratuita ultrarrápida de 1M de contexto
+
+### 🔌 Todos los 15 Proveedores Integrados
+| Proveedor | Modelo por Defecto / Flagship | Clave en `.env` |
+|---|---|---|
+| **OpenRouter** | GPT-6 Astra, Claude Fable 5.1, Gemini 3.8, Colección Gratuita | `OPENROUTER_API_KEY` |
+| **OpenAI** | GPT-6 Astra, GPT-6 Astra Pro, o3-mini | `OPENAI_API_KEY` |
+| **Anthropic** | Claude Fable 5.1, Claude Opus 5 | `ANTHROPIC_API_KEY` |
+| **Google** | Gemini 3.8 Flash, Gemini 3.7 Flash | `GOOGLE_API_KEY` / `GEMINI_API_KEY` |
+| **DeepSeek** | DeepSeek V4.1 Flash, DeepSeek V4 Pro | `DEEPSEEK_API_KEY` |
 | **Groq** | Llama 3.3 70B, Mixtral 8x7B | `GROQ_API_KEY` |
 | **Mistral** | Mistral Large, Codestral | `MISTRAL_API_KEY` |
-| **Cohere** | Command R+ | `COHERE_API_KEY` |
+| **Cohere** | Command R+, North Mini Code | `COHERE_API_KEY` |
 | **xAI** | Grok-3 | `XAI_API_KEY` |
-| **OpenRouter** | Cualquier modelo | `OPENROUTER_API_KEY` |
-| **Ollama** | Cualquier modelo local | `OLLAMA_BASE_URL` |
-| + 5 más | Together, Fireworks, Perplexity, Cerebras, DeepInfra | — |
+| **Together AI** | Llama, Qwen, DeepSeek open weights | `TOGETHER_API_KEY` |
+| **Fireworks AI** | DeepSeek V4, Qwen 3.8 | `FIREWORKS_API_KEY` |
+| **Perplexity** | Sonar Pro, Sonar Reasoning | `PERPLEXITY_API_KEY` |
+| **Cerebras** | Llama 3.3 70B (ultra-rápido) | `CEREBRAS_API_KEY` |
+| **DeepInfra** | DeepSeek V4, R1 | `DEEPINFRA_API_KEY` |
+| **Ollama** | Modelos locales offline (sin clave de API) | `OLLAMA_BASE_URL` |
+
+Cambia de proveedor o modelo en cualquier instante directamente desde la interfaz de chat.
 
 ---
 

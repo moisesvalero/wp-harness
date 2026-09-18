@@ -85,11 +85,15 @@ OPENROUTER_API_KEY=sk-or-...
 
 ### 3. Launch
 
+**On macOS (one-click):**
+Double-click `WP Forge.command` in Finder.
+
+**Or from Terminal:**
 ```bash
 ./start-wp-forge.sh
 ```
 
-Your browser opens automatically. Select the **WP Forge** agent preset and start chatting.
+Your browser opens automatically at `http://127.0.0.1:3080/` with the **WP Forge** agent ready to chat.
 
 ---
 
@@ -122,27 +126,61 @@ Once configured, the agent has access to 50+ WordPress management tools (posts, 
 
 ---
 
-## Supported LLM Providers
+## 🎯 Model Selection & Switching
 
-| Provider | Models | Key |
+You have complete freedom to choose any model directly from the UI:
+
+1. **Composer Dropdown Menu:** In the prompt input bar, click on the model name badge (defaults to `OpenAI GPT-6 Astra`). A popup menu lets you pick any available model.
+   - **Auto-Persist:** Whichever model you pick is automatically saved as your **default model for all future sessions**!
+2. **Slash Command `/model`:** Type `/model` into the chat box to trigger the quick fuzzy search and switch models instantly via keyboard.
+3. **Settings Panel (⚙️ Settings → Models):** View, customize, or add extra model endpoints and custom API keys at any time.
+
+---
+
+## Supported LLM Providers & 2026 Flagships
+
+WP Forge supports **15+ AI providers** and features live-verified **2026 cutting-edge flagships** with a strict `maxOutputTokens: 4096` guard to prevent OpenRouter `402 Payment Required` rejections:
+
+### 🌟 2026 Flagships (OpenRouter & Direct)
+| Model | Context Window | Best For |
 |---|---|---|
-| **OpenAI** | GPT-4o, o3-mini | `OPENAI_API_KEY` |
-| **Anthropic** | Claude 3.7 Sonnet, Claude 3.5 Haiku | `ANTHROPIC_API_KEY` |
-| **Google** | Gemini 2.5 Pro, Gemini 2.5 Flash | `GOOGLE_API_KEY` |
-| **DeepSeek** | DeepSeek Chat (V3), DeepSeek Reasoner (R1) | `DEEPSEEK_API_KEY` |
+| **OpenAI GPT-6 Astra** *(Default)* | 1.05M tokens | Premier agentic coding, reasoning, and FSE architecture |
+| **OpenAI GPT-6 Astra Pro** | 1.05M tokens | Complex full-stack plugins and database migrations |
+| **Anthropic Claude Fable 5.1** | 1.00M tokens | Extended-context architectural design and deep review |
+| **Anthropic Claude Opus 5** | 1.00M tokens | Multi-step autonomous reasoning and logic verification |
+| **Google Gemini 3.8 Flash** | 1.05M tokens | Ultra-fast token generation with massive 1M context |
+| **Google Gemini 3.7 Flash** | 1.05M tokens | Balanced high-speed multimodal agentic flow |
+| **DeepSeek V4.1 Flash** | 1.05M tokens | High-throughput coding and autonomous tool execution |
+| **DeepSeek V4 Pro** | 1.05M tokens | High-precision code analysis and debugging |
+| **Qwen 3.8 Flash** | 1.00M tokens | Specialized coding, PHP syntax, and block patterns |
+
+### 🆓 OpenRouter Free Models ($0 Credit Cost)
+Zero-credit models verified for agentic workflows:
+- `openrouter/free` — Intelligent auto-router across free tier models
+- `deepseek/deepseek-v4-flash-0731:free` — 1M context with zero token cost
+- `cohere/north-mini-code:free` — Code-optimized free model
+- `nvidia/nemotron-3.5-lightning:free` — 1M context ultra-fast free tier
+
+### 🔌 All 15 Integrated Providers
+| Provider | Default / Flagship | Key |
+|---|---|---|
+| **OpenRouter** | GPT-6 Astra, Claude Fable 5.1, Gemini 3.8, Free Collection | `OPENROUTER_API_KEY` |
+| **OpenAI** | GPT-6 Astra, GPT-6 Astra Pro, o3-mini | `OPENAI_API_KEY` |
+| **Anthropic** | Claude Fable 5.1, Claude Opus 5 | `ANTHROPIC_API_KEY` |
+| **Google** | Gemini 3.8 Flash, Gemini 3.7 Flash | `GOOGLE_API_KEY` / `GEMINI_API_KEY` |
+| **DeepSeek** | DeepSeek V4.1 Flash, DeepSeek V4 Pro | `DEEPSEEK_API_KEY` |
 | **Groq** | Llama 3.3 70B, Mixtral 8x7B | `GROQ_API_KEY` |
 | **Mistral** | Mistral Large, Codestral | `MISTRAL_API_KEY` |
-| **Cohere** | Command R+ | `COHERE_API_KEY` |
+| **Cohere** | Command R+, North Mini Code | `COHERE_API_KEY` |
 | **xAI** | Grok-3 | `XAI_API_KEY` |
-| **OpenRouter** | Any model via unified API | `OPENROUTER_API_KEY` |
-| **Together AI** | Llama, Qwen, DeepSeek | `TOGETHER_API_KEY` |
-| **Fireworks AI** | DeepSeek V3, Qwen 2.5 Coder | `FIREWORKS_API_KEY` |
-| **Perplexity** | Sonar Pro | `PERPLEXITY_API_KEY` |
-| **Cerebras** | Llama 3.1 70B (ultra-fast) | `CEREBRAS_API_KEY` |
-| **DeepInfra** | DeepSeek V3, R1 | `DEEPINFRA_API_KEY` |
-| **Ollama** | Any local model | `OLLAMA_BASE_URL` |
+| **Together AI** | Llama, Qwen, DeepSeek open weights | `TOGETHER_API_KEY` |
+| **Fireworks AI** | DeepSeek V4, Qwen 3.8 | `FIREWORKS_API_KEY` |
+| **Perplexity** | Sonar Pro, Sonar Reasoning | `PERPLEXITY_API_KEY` |
+| **Cerebras** | Llama 3.3 70B (ultra-fast) | `CEREBRAS_API_KEY` |
+| **DeepInfra** | DeepSeek V4, R1 | `DEEPINFRA_API_KEY` |
+| **Ollama** | Local offline models (no API key required) | `OLLAMA_BASE_URL` |
 
-Switch between providers at any time from the UI — no restart needed.
+Switch between providers and models at any time directly from the chat UI.
 
 ---
 
