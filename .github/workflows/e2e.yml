@@ -84,7 +84,7 @@ jobs:
             echo "DEEPSEEK_API_KEY present."
           fi
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         if: steps.preflight.outputs.has_key == 'true'
 
       - uses: actions/setup-node@v6
