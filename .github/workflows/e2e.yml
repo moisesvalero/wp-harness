@@ -32,9 +32,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-  schedule:
-    # 00:17 UTC nightly = 08:17 Asia/Shanghai — off the top-of-hour cron stampede.
-    - cron: '17 0 * * *'
 
 # Keep only the newest validation in each workflow/ref, including master
 # pushes, nightly runs, and manual dispatches.
@@ -69,26 +66,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install (immutable)
-        run: pnpm install --frozen-lockfile
-
-      # The with-key escalation e2e self-skips without a usable runner. Prepare
-      # bwrap so trusted CI exercises it; the functional probe remains the
-      # authority on whether the runner can use the sandbox.
-      - name: Prepare bubblewrap (unrestrict userns)
-        run: bash scripts/prepare-ci-bubblewrap.sh
-
       # Guard against a false green: the e2e suites self-skip when the key is
       # absent, so a missing/misconfigured secret would otherwise pass as
       # "all skipped". This job only runs on trusted events (the `if:` above
-      # excludes keyless PRs), so the secret MUST be present — fail loudly if not.
+      # excludes keyless PRs), so check if secret is configured first before setup.
       - name: Preflight (require DEEPSEEK_API_KEY)
         id: preflight
         env:
@@ -102,6 +83,26 @@ jobs:
             echo "has_key=true" >> "$GITHUB_OUTPUT"
             echo "DEEPSEEK_API_KEY present."
           fi
+
+      - uses: pnpm/action-setup@v4
+        if: steps.preflight.outputs.has_key == 'true'
+
+      - uses: actions/setup-node@v6
+        if: steps.preflight.outputs.has_key == 'true'
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install (immutable)
+        if: steps.preflight.outputs.has_key == 'true'
+        run: pnpm install --frozen-lockfile
+
+      # The with-key escalation e2e self-skips without a usable runner. Prepare
+      # bwrap so trusted CI exercises it; the functional probe remains the
+      # authority on whether the runner can use the sandbox.
+      - name: Prepare bubblewrap (unrestrict userns)
+        if: steps.preflight.outputs.has_key == 'true'
+        run: bash scripts/prepare-ci-bubblewrap.sh
 
       # The e2e suites boot the example bins in `lib` mode (DSH_EXAMPLE_MODE=lib):
       # the built artifact under plain Node, resolving plugins through real package
